@@ -30,6 +30,7 @@ public class Analizer {
                 //salto de linea
                 else if(isLineBreak(charA)){
                     row++;
+                    column = 1;
                 }
                 else {
                     tokenType = assignTokenType(lexem, charA);
@@ -420,10 +421,6 @@ public class Analizer {
 
     public static boolean isCompare(char c){
         return c== '='|| c=='!' || c=='>' ||c=='<';
-    }
-
-    public static boolean isAssign(char a){
-        return a=='=';
     }
 
     public static boolean isPoint(char a){
