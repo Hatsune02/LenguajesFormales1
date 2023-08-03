@@ -2,9 +2,8 @@ package backend;
 
 public class Token {
     private TokenType type;
-    private String lexem;
-    private int row, column;
-
+    private final String lexem;
+    private final int row, column;
     public Token(TokenType type, String lexeme, int row, int column){
         this.type = type;
         this.lexem = lexeme;

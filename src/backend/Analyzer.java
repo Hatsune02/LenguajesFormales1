@@ -2,13 +2,13 @@ package backend;
 
 import java.util.ArrayList;
 
-public class analizerr {
+public class Analyzer {
     ArrayList<Token> tokens = new ArrayList<>();
     String text;
-    public analizerr(String text){
+    public Analyzer(String text){
         this.text = text + "\n";
     }
-    public void analize(){
+    public void analyze(){
         System.out.println(s0(tokens,new StringBuilder(),0,0,0).toString());
     }
     public ArrayList<Token> s0(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column){
@@ -29,7 +29,8 @@ public class analizerr {
         char character = text.charAt(index);
         if(possibleIdentifier(lexeme.toString(),character)) return sPossibleIdentifier(tokens, lexeme.append(character), index+1, row, column+1,initialColumn);
         if(isDelimiter(character)){
-            tokens.add(new Token(TokenType.IDENTIFIER, lexeme.toString(), row, initialColumn));
+            if(isKeyWord(lexeme.toString())) tokens.add(new Token(TokenType.KEYWORD, lexeme.toString(), row, initialColumn));
+            else tokens.add(new Token(TokenType.IDENTIFIER, lexeme.toString(), row, initialColumn));
             return s0(tokens, new StringBuilder(),index,row,column);
         }
         return sError(tokens, lexeme.append(character), index+1, row, column+1, column);
@@ -38,11 +39,11 @@ public class analizerr {
         char character = text.charAt(index);
         if(possibleArithmetic(lexeme.toString(),character)){
             tokens.add(new Token(TokenType.ARITHMETIC,lexeme.append(character).toString(),row,initialColumn));
-            return s0(tokens,new StringBuilder(),index+1,row,column);
+            return s0(tokens,new StringBuilder(),index+1,row,column+1);
         }
         if(character == '='){
             tokens.add(new Token(TokenType.ASSIGNMENT,lexeme.append(character).toString(),row,initialColumn));
-            return s0(tokens,new StringBuilder(),index+1,row,column);
+            return s0(tokens,new StringBuilder(),index+1,row,column+1);
         }
         tokens.add(new Token(TokenType.ARITHMETIC,lexeme.toString(),row,initialColumn));
         return s0(tokens, new StringBuilder(),index,row,column);
@@ -51,7 +52,7 @@ public class analizerr {
         char character = text.charAt(index);
         if(possibleCompare(lexeme.toString(),character)){
             tokens.add(new Token(TokenType.COMPARASION,lexeme.append(character).toString(),row,initialColumn));
-            return s0(tokens,new StringBuilder(),index+1,row,column);
+            return s0(tokens,new StringBuilder(),index+1,row,column+1);
         }
         if(lexeme.toString().equals("=")){
             tokens.add(new Token(TokenType.ASSIGNMENT,lexeme.toString(),row,initialColumn));
@@ -142,24 +143,24 @@ public class analizerr {
     public static boolean isLineBreak(char a){
         return a==(char)10;
     }
-    public static boolean possibleIdentifier(String lexem, char letter){
-        if(lexem.equals("")){
+    public static boolean possibleIdentifier(String lexeme, char letter){
+        if(lexeme.equals("")){
             return letter == (char) 95 || isLetter(letter);
         }
         else{
             return letter == (char) 95 || isLetter(letter) || isNumber(letter);
         }
     }
-    public static boolean possibleArithmetic(String lexem, char letter){
-        return switch (lexem) {
+    public static boolean possibleArithmetic(String lexeme, char letter){
+        return switch (lexeme) {
             case "" -> isArithmetic(letter);
             case "*" -> letter == '*';
             case "/" -> letter == '/';
             default -> false;
         };
     }
-    public static boolean possibleCompare(String lexem, char letter){
-        return switch (lexem) {
+    public static boolean possibleCompare(String lexeme, char letter){
+        return switch (lexeme) {
             case "" -> isCompare(letter);
             case "=", "!", ">", "<" -> letter == '=';
             default -> false;
@@ -171,5 +172,13 @@ public class analizerr {
     public static boolean possibleString(char letter){
         //(char)34 es comillas "  y (char)39 es comilla '
         return letter == (char) 34 || letter == (char) 39;
+    }
+    public static boolean isKeyWord(String lexeme){
+        String[] keyWords = {"and", "as" , "assert" , "break" , "class" , "continue" , "def" ,
+                "del" , "elif" , "else" , "except" , "False" , "finally" , "for" , "from" , "global" ,
+                "if" , "import" , "in" , "is" , "lambda" , "None" , "nonlocal" , "not" , "or" , "pass" ,
+                "raise" , "return" , "True" , "try" , "while" , "with" , "yield"};
+        for (String keyWord : keyWords) {if (lexeme.equals(keyWord)) return true;}
+        return false;
     }
 }
