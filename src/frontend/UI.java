@@ -7,10 +7,14 @@ import backend.TokenType;
 public class UI extends javax.swing.JFrame {
     Analyzer analyzer;
     LineNumber lineNumber, lineNumber2, lineNumber3;
+    Reports reports;
 
     public UI() {
 
         initComponents();
+        jComboBoxID.setEditable(true);
+        jPanel1.removeAll();
+
         lineNumber = new LineNumber(jTextPaneAnalyze);
         lineNumber2 = new LineNumber(jTextPaneError);
         lineNumber3 = new LineNumber(jTextPanePaint);
@@ -921,6 +925,11 @@ public class UI extends javax.swing.JFrame {
         PaintWords paintWords = new PaintWords();
         paintWords.setStyle(jTextPaneAnalyze.getText());
         paintWords.paintTokens(analyzer);
+
+        //PRUEBA REPORTS
+        reports = new Reports(analyzer.getTokens());
+        jPanel1.removeAll();
+        reports.table(jPanel1);
 
         jTextPaneAnalyze.setDocument(paintWords.textPane.getDocument());
         jTextPanePaint.setDocument(paintWords.textPane.getDocument());
