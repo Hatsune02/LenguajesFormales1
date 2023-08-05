@@ -2,7 +2,11 @@ package frontend;
 
 import backend.Analyzer;
 import backend.ReaderText;
+import backend.Token;
 import backend.TokenType;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class UI extends javax.swing.JFrame {
     Analyzer analyzer;
@@ -13,7 +17,17 @@ public class UI extends javax.swing.JFrame {
 
         initComponents();
         jComboBoxID.setEditable(true);
+        jComboBoxArithmetic.setEditable(true);
+        jComboBoxAssign.setEditable(true);
+        jComboBoxComment.setEditable(true);
+        jComboBoxKeyWords.setEditable(true);
+        jComboBoxComparison.setEditable(true);
+        jComboBoxConstant.setEditable(true);
+        jComboBoxOthers.setEditable(true);
+
         jPanel1.removeAll();
+        jPanel1.setLayout(new BorderLayout(0,0));
+
 
         lineNumber = new LineNumber(jTextPaneAnalyze);
         lineNumber2 = new LineNumber(jTextPaneError);
@@ -926,6 +940,8 @@ public class UI extends javax.swing.JFrame {
         paintWords.setStyle(jTextPaneAnalyze.getText());
         paintWords.paintTokens(analyzer);
 
+        fillComboBox();
+
         //PRUEBA REPORTS
         reports = new Reports(analyzer.getTokens());
         jPanel1.removeAll();
@@ -935,48 +951,154 @@ public class UI extends javax.swing.JFrame {
         jTextPanePaint.setDocument(paintWords.textPane.getDocument());
     }
 
+    private void fillComboBox(){
+        jComboBoxID.removeAllItems();
+        jComboBoxArithmetic.removeAllItems();
+        jComboBoxAssign.removeAllItems();
+        jComboBoxComment.removeAllItems();
+        jComboBoxKeyWords.removeAllItems();
+        jComboBoxComparison.removeAllItems();
+        jComboBoxConstant.removeAllItems();
+        jComboBoxOthers.removeAllItems();
+
+        for (Token token : analyzer.filterArrayList(TokenType.IDENTIFIER)) {
+            jComboBoxID.addItem(token.getLexem());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.ARITHMETIC)) {
+            jComboBoxArithmetic.addItem(token.getLexem());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.COMPARASION)) {
+            jComboBoxComparison.addItem(token.getLexem());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.ASSIGNMENT)) {
+            jComboBoxAssign.addItem(token.getLexem());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.KEYWORD)) {
+            jComboBoxKeyWords.addItem(token.getLexem());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.CONSTANT)) {
+            jComboBoxConstant.addItem(token.getLexem());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.COMMENT)) {
+            jComboBoxComment.addItem(token.getLexem());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.OTHERS)) {
+            jComboBoxOthers.addItem(token.getLexem());
+        }
+    }
+
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {
         jTextPaneAnalyze.setText(ReaderText.Read());
     }
 
     private void jButtonReportCommentActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try{
+            reports = new Reports(analyzer.filterArrayList(TokenType.COMMENT));
+            jPanel1.removeAll();
+            reports.table(jPanel1);
+            SwingUtilities.updateComponentTreeUI(jPanel1);
+        } catch (Exception e){
+
+        }
     }
 
     private void jButtonReportAllActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try{
+            reports = new Reports(analyzer.getTokens());
+            jPanel1.removeAll();
+            reports.table(jPanel1);
+            SwingUtilities.updateComponentTreeUI(jPanel1);
+        } catch (Exception e){
+
+        }
     }
 
     private void jButtonReportIDActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try{
+            reports = new Reports(analyzer.filterArrayList(TokenType.IDENTIFIER));
+            jPanel1.removeAll();
+            reports.table(jPanel1);
+            SwingUtilities.updateComponentTreeUI(jPanel1);
+        } catch (Exception e){
+
+        }
     }
 
     private void jButtonReportArithmeticActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try{
+            reports = new Reports(analyzer.filterArrayList(TokenType.ARITHMETIC));
+            jPanel1.removeAll();
+            reports.table(jPanel1);
+            SwingUtilities.updateComponentTreeUI(jPanel1);
+        } catch (Exception e){
+
+        }
     }
 
     private void jButtonReportCompareActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try{
+            reports = new Reports(analyzer.filterArrayList(TokenType.COMPARASION));
+            jPanel1.removeAll();
+            reports.table(jPanel1);
+            SwingUtilities.updateComponentTreeUI(jPanel1);
+        } catch (Exception e){
+
+        }
     }
 
     private void jButtonReportAssignActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try{
+            reports = new Reports(analyzer.filterArrayList(TokenType.ASSIGNMENT));
+            jPanel1.removeAll();
+            reports.table(jPanel1);
+            SwingUtilities.updateComponentTreeUI(jPanel1);
+        } catch (Exception e){
+
+        }
     }
 
     private void jButtonReportKeyWordActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try{
+            reports = new Reports(analyzer.filterArrayList(TokenType.KEYWORD));
+            jPanel1.removeAll();
+            reports.table(jPanel1);
+            SwingUtilities.updateComponentTreeUI(jPanel1);
+        } catch (Exception e){
+
+        }
     }
 
     private void jButtonReportConstantActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try{
+            reports = new Reports(analyzer.filterArrayList(TokenType.CONSTANT));
+            jPanel1.removeAll();
+            reports.table(jPanel1);
+            SwingUtilities.updateComponentTreeUI(jPanel1);
+        } catch (Exception e){
+
+        }
     }
 
     private void jButtonReportOthersActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try{
+            reports = new Reports(analyzer.filterArrayList(TokenType.OTHERS));
+            jPanel1.removeAll();
+            reports.table(jPanel1);
+            SwingUtilities.updateComponentTreeUI(jPanel1);
+        } catch (Exception e){
+
+        }
     }
 
     private void jButtonReportErrActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try{
+            reports = new Reports(analyzer.filterArrayList(TokenType.ERROR));
+            jPanel1.removeAll();
+            reports.table(jPanel1);
+            SwingUtilities.updateComponentTreeUI(jPanel1);
+        } catch (Exception e){
+
+        }
     }
 
 
