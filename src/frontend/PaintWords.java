@@ -25,60 +25,60 @@ public class PaintWords {
             System.out.println("No se pudo pintar");
         }
     }
-    public void paintBlue(int initialPos, int finalPos){
+    public void paintBlue(int position, int length){
         Style blue = sc.addStyle("ConstantWidth", null);
         StyleConstants.setForeground(blue, Color.BLUE);
-        doc.setCharacterAttributes(initialPos,finalPos,blue,false);
+        doc.setCharacterAttributes(position,length,blue,false);
     }
-    public void paintRed(int initialPos, int finalPos){
+    public void paintRed(int position, int length){
         Style red = sc.addStyle("ConstantWidth", null);
         StyleConstants.setForeground(red, Color.RED);
-        doc.setCharacterAttributes(initialPos,finalPos,red,false);
+        doc.setCharacterAttributes(position,length,red,false);
     }
-    public void paintYellow(int initialPos, int finalPos){
+    public void paintYellow(int position, int length){
         Style yellow = sc.addStyle("ConstantWidth", null);
         StyleConstants.setForeground(yellow, Color.YELLOW);
-        doc.setCharacterAttributes(initialPos,finalPos,yellow,false);
+        doc.setCharacterAttributes(position,length,yellow,false);
     }
-    public void paintSkyBlue(int initialPos, int finalPos){
+    public void paintSkyBlue(int position, int length){
         Style skyBlue = sc.addStyle("ConstantWidth", null);
-        StyleConstants.setForeground(skyBlue, Color.decode("#2ECCFA"));
-        doc.setCharacterAttributes(initialPos,finalPos,skyBlue,false);
+        StyleConstants.setForeground(skyBlue, Color.decode("0x2ECCFA"));
+        doc.setCharacterAttributes(position,length,skyBlue,false);
     }
-    public void paintCyan(int initialPos, int finalPos){
+    public void paintCyan(int position, int length){
         Style cyan = sc.addStyle("ConstantWidth", null);
         StyleConstants.setForeground(cyan, Color.CYAN);
-        doc.setCharacterAttributes(initialPos,finalPos,cyan,false);
+        doc.setCharacterAttributes(position,length,cyan,false);
     }
-    public void paintMagenta(int initialPos, int finalPos){
+    public void paintMagenta(int position, int length){
         Style magenta = sc.addStyle("ConstantWidth", null);
         StyleConstants.setForeground(magenta, Color.MAGENTA);
-        doc.setCharacterAttributes(initialPos,finalPos,magenta,false);
+        doc.setCharacterAttributes(position,length,magenta,false);
     }
-    public void paintGray(int initialPos, int finalPos){
+    public void paintGray(int position, int length){
         Style gray = sc.addStyle("ConstantWidth", null);
         StyleConstants.setForeground(gray, Color.GRAY);
-        doc.setCharacterAttributes(initialPos,finalPos,gray,false);
+        doc.setCharacterAttributes(position,length,gray,false);
     }
-    public void paintGreen(int initialPos, int finalPos){
+    public void paintGreen(int position, int length){
         Style green = sc.addStyle("ConstantWidth", null); //#088A29
         StyleConstants.setForeground(green, Color.GREEN);
-        doc.setCharacterAttributes(initialPos,finalPos,green,false);
+        doc.setCharacterAttributes(position,length,green,false);
     }
-    public void paintLightGreen(int initialPos, int finalPos){
+    public void paintLightGreen(int position, int length){
         Style lightGreen = sc.addStyle("ConstantWidth", null);
-        StyleConstants.setForeground(lightGreen, Color.decode("#86B404 "));
-        doc.setCharacterAttributes(initialPos,finalPos,lightGreen,false);
+        StyleConstants.setForeground(lightGreen, Color.decode("0x86B404"));
+        doc.setCharacterAttributes(position,length,lightGreen,false);
     }
-    public void paintOrange(int initialPos, int finalPos){
+    public void paintOrange(int position, int length){
         Style orange = sc.addStyle("ConstantWidth", null);
         StyleConstants.setForeground(orange, Color.ORANGE);
-        doc.setCharacterAttributes(initialPos,finalPos,orange,false);
+        doc.setCharacterAttributes(position,length,orange,false);
     }
-    public void paintPurple(int initialPos, int finalPos){
+    public void paintPurple(int position, int length){
         Style purple = sc.addStyle("ConstantWidth", null);
-        StyleConstants.setForeground(purple, Color.decode("#9400D3"));
-        doc.setCharacterAttributes(initialPos,finalPos,purple,false);
+        StyleConstants.setForeground(purple, Color.decode("0x9400D3"));
+        doc.setCharacterAttributes(position,length,purple,false);
     }
     //YYCHAR YYLENGTH
 }

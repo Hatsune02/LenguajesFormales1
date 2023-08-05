@@ -58,7 +58,13 @@ public class SimpleList {
 
         Node aux = first;
         while(aux!=null){
-            text.append(aux.getCharacter()).append("->");
+            if(aux.getCharacter() == (char) 32 || aux.getCharacter() == (char) 10 || aux.getCharacter() == (char) 9){
+                text.append("\" \"");
+                text.append("->");
+            }
+            else {
+                text.append(aux.getCharacter()).append("->");
+            }
             aux = aux.getNext();
         }
         text.deleteCharAt(text.length()-1);
@@ -96,7 +102,14 @@ public class SimpleList {
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
 
-
+    public void setNodes(String lexeme){
+        for (int i = 0; i < lexeme.length(); i++) {
+            if(lexeme.charAt(i) == (char)9 ){
+                instert(lexeme.charAt((char)9));
+            }
+            instert(lexeme.charAt(i));
+        }
     }
 }

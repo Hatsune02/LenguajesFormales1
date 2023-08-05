@@ -15,7 +15,7 @@ public class ReaderText {
 
         File file = load.getSelectedFile();
         int contador = 0;
-        String read = "";
+        StringBuilder read = new StringBuilder();
 
         try {
             BufferedReader enter = new BufferedReader(new FileReader(file));
@@ -23,15 +23,14 @@ public class ReaderText {
             while (reading != null) {
                 contador++;
                 String cont = " " + contador;
-
+                read.append(reading).append("\n");
                 reading = enter.readLine();
             }
-            read = reading;
             enter.close();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Error al cargar el archivo");
             System.out.println(ex);
         }
-        return read;
+        return read.toString();
     }
 }
