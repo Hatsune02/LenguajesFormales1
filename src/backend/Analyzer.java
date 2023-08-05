@@ -1,6 +1,7 @@
 package backend;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Analyzer {
     private ArrayList<Token> tokens = new ArrayList<>();
@@ -186,4 +187,7 @@ public class Analyzer {
         return false;
     }
     public ArrayList<Token> getTokens() {return tokens;}
+    public ArrayList<Token> filterArrayList(ArrayList<Token> list, TokenType type){
+        return  (ArrayList<Token>) list.stream().filter(x -> x.getType().equals(type)).collect(Collectors.toList());
+    }
 }
