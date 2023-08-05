@@ -1,11 +1,16 @@
 package frontend;
 
+import backend.Analyzer;
+import backend.Token;
+import backend.TokenType;
+
 import javax.swing.*;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class PaintWords {
     public JTextPane textPane;
@@ -72,13 +77,41 @@ public class PaintWords {
     }
     public void paintOrange(int position, int length){
         Style orange = sc.addStyle("ConstantWidth", null);
-        StyleConstants.setForeground(orange, Color.ORANGE);
+        StyleConstants.setForeground(orange, Color.decode("0xFF7800"));
         doc.setCharacterAttributes(position,length,orange,false);
     }
     public void paintPurple(int position, int length){
         Style purple = sc.addStyle("ConstantWidth", null);
         StyleConstants.setForeground(purple, Color.decode("0x9400D3"));
         doc.setCharacterAttributes(position,length,purple,false);
+    }
+
+    public void paintTokens(Analyzer analyzer){
+        for (Token token : analyzer.filterArrayList(TokenType.IDENTIFIER)) {
+            paintBlue(token.getIndex(), token.getLexem().length());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.ARITHMETIC)) {
+            paintSkyBlue(token.getIndex(), token.getLexem().length());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.COMPARASION)) {
+            paintSkyBlue(token.getIndex(), token.getLexem().length());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.ASSIGNMENT)) {
+            paintSkyBlue(token.getIndex(), token.getLexem().length());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.KEYWORD)) {
+            paintPurple(token.getIndex(), token.getLexem().length());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.CONSTANT)) {
+            paintOrange(token.getIndex(), token.getLexem().length());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.COMMENT)) {
+            paintGray(token.getIndex(), token.getLexem().length());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.OTHERS)) {
+            paintGreen(token.getIndex(), token.getLexem().length());
+        }
+
     }
     //YYCHAR YYLENGTH
 }

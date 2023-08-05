@@ -1,7 +1,11 @@
 package frontend;
 
-public class UI extends javax.swing.JFrame {
+import backend.Analyzer;
+import backend.ReaderText;
+import backend.TokenType;
 
+public class UI extends javax.swing.JFrame {
+    Analyzer analyzer;
     LineNumber lineNumber, lineNumber2, lineNumber3;
 
     public UI() {
@@ -36,7 +40,7 @@ public class UI extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextPaneError = new javax.swing.JTextPane();
         jLabel3 = new javax.swing.JLabel();
-        jPanelPaint = new javax.swing.JPanel();
+        //jPanelPaint = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTextPanePaint = new javax.swing.JTextPane();
         jPanelGraph = new javax.swing.JPanel();
@@ -177,11 +181,11 @@ public class UI extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Archivo", jPanelFile);
 
-        jPanelPaint.setBackground(new java.awt.Color(0, 105, 105));
+        //jPanelPaint.setBackground(new java.awt.Color(0, 105, 105));
 
         jScrollPane3.setViewportView(jTextPanePaint);
 
-        javax.swing.GroupLayout jPanelPaintLayout = new javax.swing.GroupLayout(jPanelPaint);
+/*        javax.swing.GroupLayout jPanelPaintLayout = new javax.swing.GroupLayout(jPanelPaint);
         jPanelPaint.setLayout(jPanelPaintLayout);
         jPanelPaintLayout.setHorizontalGroup(
                 jPanelPaintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -198,7 +202,7 @@ public class UI extends javax.swing.JFrame {
                                 .addGap(46, 46, 46))
         );
 
-        jTabbedPane1.addTab("Pintar", jPanelPaint);
+        jTabbedPane1.addTab("Pintar", jPanelPaint);*/
 
         jPanelGraph.setBackground(new java.awt.Color(0, 51, 102));
 
@@ -911,11 +915,19 @@ public class UI extends javax.swing.JFrame {
     }
 
     private void jLabelAnalyzeMouseClicked(java.awt.event.MouseEvent evt) {
-        // TODO add your handling code here:
+        analyzer = new Analyzer(jTextPaneAnalyze.getText());
+        analyzer.analyze();
+        jTextPaneError.setText(analyzer.filterArrayList(TokenType.ERROR).toString());
+        PaintWords paintWords = new PaintWords();
+        paintWords.setStyle(jTextPaneAnalyze.getText());
+        paintWords.paintTokens(analyzer);
+
+        jTextPaneAnalyze.setDocument(paintWords.textPane.getDocument());
+        jTextPanePaint.setDocument(paintWords.textPane.getDocument());
     }
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        jTextPaneAnalyze.setText(ReaderText.Read());
     }
 
     private void jButtonReportCommentActionPerformed(java.awt.event.ActionEvent evt) {
@@ -1047,7 +1059,7 @@ public class UI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelFile;
     private javax.swing.JPanel jPanelGraph;
     private javax.swing.JPanel jPanelHelp;
-    private javax.swing.JPanel jPanelPaint;
+    //private javax.swing.JPanel jPanelPaint;
     private javax.swing.JPanel jPanelReport;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

@@ -70,7 +70,7 @@ public class Analyzer {
             tokens.add(new Token(TokenType.CONSTANT, lexeme.toString(), row, initialColumn, tokenIndex));
             return s0(tokens, new StringBuilder(),index,row,column);
         }
-        return sError(tokens, lexeme.append(character), index+1, row, column+1, column, tokenIndex);
+        return sError(tokens, lexeme.append(character), index+1, row, column+1, initialColumn, tokenIndex);
     }
     public ArrayList<Token> sPossibleDecimal(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column,int initialColumn, int tokenIndex){
         char character = text.charAt(index);
@@ -88,7 +88,7 @@ public class Analyzer {
             tokens.add(new Token(TokenType.CONSTANT,lexeme.append(character).toString(),row,initialColumn, tokenIndex));
             return s0(tokens,new StringBuilder(),index+1,row,column+1);
         }
-        if(isLineBreak(character)) return sError(tokens,new StringBuilder(),index,row,column,initialColumn, tokenIndex);
+        if(isLineBreak(character)) return sError(tokens,lexeme,index,row,column,initialColumn, tokenIndex);
         return sPossibleString(tokens,lexeme.append(character),index+1,row,column+1,initialColumn, tokenIndex);
     }
     public ArrayList<Token> sPossibleComment(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
@@ -187,7 +187,7 @@ public class Analyzer {
         return false;
     }
     public ArrayList<Token> getTokens() {return tokens;}
-    public ArrayList<Token> filterArrayList(ArrayList<Token> list, TokenType type){
-        return  (ArrayList<Token>) list.stream().filter(x -> x.getType().equals(type)).collect(Collectors.toList());
+    public ArrayList<Token> filterArrayList(TokenType type){
+        return  (ArrayList<Token>) tokens.stream().filter(x -> x.getType().equals(type)).collect(Collectors.toList());
     }
 }
