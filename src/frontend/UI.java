@@ -10,8 +10,13 @@ import java.awt.*;
 
 public class UI extends javax.swing.JFrame {
     Analyzer analyzer;
+    SimpleList simpleList;
+    CreateHTML png;
+    PNGFrame pngFrame;
     LineNumber lineNumber, lineNumber2, lineNumber3;
     Reports reports;
+    String comboBoxID,comboBoxArithmetic,comboBoxAssign,comboBoxComment,
+            comboBoxKeyWord, comboBoxComparison, comboBoxConstant, comboBoxOthers;
 
     public UI() {
 
@@ -25,9 +30,11 @@ public class UI extends javax.swing.JFrame {
         jComboBoxConstant.setEditable(true);
         jComboBoxOthers.setEditable(true);
 
-        jPanel1.removeAll();
-        jPanel1.setLayout(new BorderLayout(0,0));
+        jPanelGraphviz.setOpaque(false);
 
+        jPanelReportTable.removeAll();
+        jPanelReportTable.setLayout(new BorderLayout(0,0));
+        jPanelReportTable.setBackground(Color.black);
 
         lineNumber = new LineNumber(jTextPaneAnalyze);
         lineNumber2 = new LineNumber(jTextPaneError);
@@ -94,9 +101,9 @@ public class UI extends javax.swing.JFrame {
         jComboBoxOthers = new javax.swing.JComboBox<>();
         jLabel20 = new javax.swing.JLabel();
         jButtonOthers = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        jPanelGraphviz = new javax.swing.JEditorPane();
         jPanelReport = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
+        jPanelReportTable = new javax.swing.JPanel();
         jButtonReportAll = new javax.swing.JButton();
         jButtonReportID = new javax.swing.JButton();
         jButtonReportArithmetic = new javax.swing.JButton();
@@ -570,8 +577,6 @@ public class UI extends javax.swing.JFrame {
                                 .addComponent(jButtonOthers))
         );
 
-        jLabel1.setText("jLabel1");
-
         javax.swing.GroupLayout jPanelGraphLayout = new javax.swing.GroupLayout(jPanelGraph);
         jPanelGraph.setLayout(jPanelGraphLayout);
         jPanelGraphLayout.setHorizontalGroup(
@@ -588,7 +593,7 @@ public class UI extends javax.swing.JFrame {
                                         .addComponent(jPanel21, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(jPanel24, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(26, 26, 26)
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 361, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jPanelGraphviz, javax.swing.GroupLayout.PREFERRED_SIZE, 361, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(17, 17, 17))
         );
         jPanelGraphLayout.setVerticalGroup(
@@ -596,7 +601,7 @@ public class UI extends javax.swing.JFrame {
                         .addGroup(jPanelGraphLayout.createSequentialGroup()
                                 .addGap(66, 66, 66)
                                 .addGroup(jPanelGraphLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jPanelGraphviz, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addGroup(jPanelGraphLayout.createSequentialGroup()
                                                 .addComponent(jPanel17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -620,8 +625,8 @@ public class UI extends javax.swing.JFrame {
 
         jPanelReport.setBackground(new java.awt.Color(0, 0, 0));
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanelReportTable);
+        jPanelReportTable.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
                 jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGap(0, 0, Short.MAX_VALUE)
@@ -725,7 +730,7 @@ public class UI extends javax.swing.JFrame {
         jPanelReport.setLayout(jPanelReportLayout);
         jPanelReportLayout.setHorizontalGroup(
                 jPanelReportLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanelReportTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanelReportLayout.createSequentialGroup()
                                 .addGap(20, 20, 20)
                                 .addGroup(jPanelReportLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -767,7 +772,7 @@ public class UI extends javax.swing.JFrame {
                                         .addComponent(jButtonReportConstant, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(jButtonReportKeyWord, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(18, 18, 18)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jPanelReportTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jTabbedPane1.addTab("Reporte", jPanelReport);
@@ -867,17 +872,44 @@ public class UI extends javax.swing.JFrame {
     private void jTabbedPane1MouseClicked(java.awt.event.MouseEvent evt) {
         // TODO add your handling code here:
     }
-
+    private boolean isValidLexeme(TokenType type, String text){
+        for (Token token : analyzer.filterArrayList(type)) {
+            if(token.getLexem().equals(text)){
+                return true;
+            }
+        }
+        return false;
+    }
     private void jComboBoxIDActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try {
+            comboBoxID = jComboBoxID.getSelectedItem().toString();
+            if(isValidLexeme(TokenType.IDENTIFIER, comboBoxID)){
+                simpleList = new SimpleList();
+                simpleList.setNodes(comboBoxID);
+                simpleList.drawGraphviz();
+            }
+        } catch (Exception e){}
+
     }
 
     private void jComboBoxOthersActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+
+        try {
+            comboBoxOthers = jComboBoxOthers.getSelectedItem().toString();
+            if(isValidLexeme(TokenType.OTHERS, comboBoxOthers)){
+                simpleList = new SimpleList();
+                simpleList.setNodes(comboBoxOthers);
+                simpleList.drawGraphviz();
+            }
+        } catch (Exception e){}
     }
 
     private void jButtonIDActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        png = new CreateHTML();
+        png.showHTML(jPanelGraphviz);
+        pngFrame = new PNGFrame();
+        pngFrame.init(jPanelGraphviz);
+        SwingUtilities.updateComponentTreeUI(jPanelGraphviz);
     }
 
     private void jButtonArithmeticActionPerformed(java.awt.event.ActionEvent evt) {
@@ -909,27 +941,69 @@ public class UI extends javax.swing.JFrame {
     }
 
     private void jComboBoxArithmeticActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try {
+            comboBoxArithmetic = jComboBoxArithmetic.getSelectedItem().toString();
+            if(isValidLexeme(TokenType.ARITHMETIC,comboBoxArithmetic)){
+                simpleList = new SimpleList();
+                simpleList.setNodes(comboBoxArithmetic);
+                simpleList.drawGraphviz();
+            }
+        } catch (Exception e){}
     }
 
     private void jComboBoxComparisonActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try {
+            comboBoxComparison = jComboBoxComparison.getSelectedItem().toString();
+            if(isValidLexeme(TokenType.COMPARASION,comboBoxComparison)){
+                simpleList = new SimpleList();
+                simpleList.setNodes(comboBoxComparison);
+                simpleList.drawGraphviz();
+            }
+        } catch (Exception e){}
     }
 
     private void jComboBoxAssignActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try {
+            comboBoxAssign = jComboBoxAssign.getSelectedItem().toString();
+            if(isValidLexeme(TokenType.ASSIGNMENT,comboBoxAssign)){
+                simpleList = new SimpleList();
+                simpleList.setNodes(comboBoxAssign);
+                simpleList.drawGraphviz();
+            }
+        } catch (Exception e){}
     }
 
     private void jComboBoxKeyWordsActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try {
+            comboBoxKeyWord = jComboBoxKeyWords.getSelectedItem().toString();
+            if(isValidLexeme(TokenType.KEYWORD,comboBoxKeyWord)){
+                simpleList = new SimpleList();
+                simpleList.setNodes(comboBoxKeyWord);
+                simpleList.drawGraphviz();
+            }
+        } catch (Exception e){}
     }
 
     private void jComboBoxConstantActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try {
+            comboBoxConstant = jComboBoxConstant.getSelectedItem().toString();
+            if(isValidLexeme(TokenType.CONSTANT,comboBoxConstant)){
+                simpleList = new SimpleList();
+                simpleList.setNodes(comboBoxConstant);
+                simpleList.drawGraphviz();
+            }
+        } catch (Exception e){}
     }
 
     private void jComboBoxCommentActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        try {
+            comboBoxComment = jComboBoxComment.getSelectedItem().toString();
+            if(isValidLexeme(TokenType.COMMENT,comboBoxComment)){
+                simpleList = new SimpleList();
+                simpleList.setNodes(comboBoxComment);
+                simpleList.drawGraphviz();
+            }
+        } catch (Exception e){}
     }
 
     private void jLabelAnalyzeMouseClicked(java.awt.event.MouseEvent evt) {
@@ -944,8 +1018,8 @@ public class UI extends javax.swing.JFrame {
 
         //PRUEBA REPORTS
         reports = new Reports(analyzer.getTokens());
-        jPanel1.removeAll();
-        reports.table(jPanel1);
+        jPanelReportTable.removeAll();
+        reports.table(jPanelReportTable);
 
         jTextPaneAnalyze.setDocument(paintWords.textPane.getDocument());
         jTextPanePaint.setDocument(paintWords.textPane.getDocument());
@@ -994,9 +1068,9 @@ public class UI extends javax.swing.JFrame {
     private void jButtonReportCommentActionPerformed(java.awt.event.ActionEvent evt) {
         try{
             reports = new Reports(analyzer.filterArrayList(TokenType.COMMENT));
-            jPanel1.removeAll();
-            reports.table(jPanel1);
-            SwingUtilities.updateComponentTreeUI(jPanel1);
+            jPanelReportTable.removeAll();
+            reports.table(jPanelReportTable);
+            SwingUtilities.updateComponentTreeUI(jPanelReportTable);
         } catch (Exception e){
 
         }
@@ -1005,9 +1079,9 @@ public class UI extends javax.swing.JFrame {
     private void jButtonReportAllActionPerformed(java.awt.event.ActionEvent evt) {
         try{
             reports = new Reports(analyzer.getTokens());
-            jPanel1.removeAll();
-            reports.table(jPanel1);
-            SwingUtilities.updateComponentTreeUI(jPanel1);
+            jPanelReportTable.removeAll();
+            reports.table(jPanelReportTable);
+            SwingUtilities.updateComponentTreeUI(jPanelReportTable);
         } catch (Exception e){
 
         }
@@ -1016,9 +1090,9 @@ public class UI extends javax.swing.JFrame {
     private void jButtonReportIDActionPerformed(java.awt.event.ActionEvent evt) {
         try{
             reports = new Reports(analyzer.filterArrayList(TokenType.IDENTIFIER));
-            jPanel1.removeAll();
-            reports.table(jPanel1);
-            SwingUtilities.updateComponentTreeUI(jPanel1);
+            jPanelReportTable.removeAll();
+            reports.table(jPanelReportTable);
+            SwingUtilities.updateComponentTreeUI(jPanelReportTable);
         } catch (Exception e){
 
         }
@@ -1027,9 +1101,9 @@ public class UI extends javax.swing.JFrame {
     private void jButtonReportArithmeticActionPerformed(java.awt.event.ActionEvent evt) {
         try{
             reports = new Reports(analyzer.filterArrayList(TokenType.ARITHMETIC));
-            jPanel1.removeAll();
-            reports.table(jPanel1);
-            SwingUtilities.updateComponentTreeUI(jPanel1);
+            jPanelReportTable.removeAll();
+            reports.table(jPanelReportTable);
+            SwingUtilities.updateComponentTreeUI(jPanelReportTable);
         } catch (Exception e){
 
         }
@@ -1038,9 +1112,9 @@ public class UI extends javax.swing.JFrame {
     private void jButtonReportCompareActionPerformed(java.awt.event.ActionEvent evt) {
         try{
             reports = new Reports(analyzer.filterArrayList(TokenType.COMPARASION));
-            jPanel1.removeAll();
-            reports.table(jPanel1);
-            SwingUtilities.updateComponentTreeUI(jPanel1);
+            jPanelReportTable.removeAll();
+            reports.table(jPanelReportTable);
+            SwingUtilities.updateComponentTreeUI(jPanelReportTable);
         } catch (Exception e){
 
         }
@@ -1049,9 +1123,9 @@ public class UI extends javax.swing.JFrame {
     private void jButtonReportAssignActionPerformed(java.awt.event.ActionEvent evt) {
         try{
             reports = new Reports(analyzer.filterArrayList(TokenType.ASSIGNMENT));
-            jPanel1.removeAll();
-            reports.table(jPanel1);
-            SwingUtilities.updateComponentTreeUI(jPanel1);
+            jPanelReportTable.removeAll();
+            reports.table(jPanelReportTable);
+            SwingUtilities.updateComponentTreeUI(jPanelReportTable);
         } catch (Exception e){
 
         }
@@ -1060,9 +1134,9 @@ public class UI extends javax.swing.JFrame {
     private void jButtonReportKeyWordActionPerformed(java.awt.event.ActionEvent evt) {
         try{
             reports = new Reports(analyzer.filterArrayList(TokenType.KEYWORD));
-            jPanel1.removeAll();
-            reports.table(jPanel1);
-            SwingUtilities.updateComponentTreeUI(jPanel1);
+            jPanelReportTable.removeAll();
+            reports.table(jPanelReportTable);
+            SwingUtilities.updateComponentTreeUI(jPanelReportTable);
         } catch (Exception e){
 
         }
@@ -1071,9 +1145,9 @@ public class UI extends javax.swing.JFrame {
     private void jButtonReportConstantActionPerformed(java.awt.event.ActionEvent evt) {
         try{
             reports = new Reports(analyzer.filterArrayList(TokenType.CONSTANT));
-            jPanel1.removeAll();
-            reports.table(jPanel1);
-            SwingUtilities.updateComponentTreeUI(jPanel1);
+            jPanelReportTable.removeAll();
+            reports.table(jPanelReportTable);
+            SwingUtilities.updateComponentTreeUI(jPanelReportTable);
         } catch (Exception e){
 
         }
@@ -1082,9 +1156,9 @@ public class UI extends javax.swing.JFrame {
     private void jButtonReportOthersActionPerformed(java.awt.event.ActionEvent evt) {
         try{
             reports = new Reports(analyzer.filterArrayList(TokenType.OTHERS));
-            jPanel1.removeAll();
-            reports.table(jPanel1);
-            SwingUtilities.updateComponentTreeUI(jPanel1);
+            jPanelReportTable.removeAll();
+            reports.table(jPanelReportTable);
+            SwingUtilities.updateComponentTreeUI(jPanelReportTable);
         } catch (Exception e){
 
         }
@@ -1093,9 +1167,9 @@ public class UI extends javax.swing.JFrame {
     private void jButtonReportErrActionPerformed(java.awt.event.ActionEvent evt) {
         try{
             reports = new Reports(analyzer.filterArrayList(TokenType.ERROR));
-            jPanel1.removeAll();
-            reports.table(jPanel1);
-            SwingUtilities.updateComponentTreeUI(jPanel1);
+            jPanelReportTable.removeAll();
+            reports.table(jPanelReportTable);
+            SwingUtilities.updateComponentTreeUI(jPanelReportTable);
         } catch (Exception e){
 
         }
@@ -1161,7 +1235,7 @@ public class UI extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> jComboBoxID;
     private javax.swing.JComboBox<String> jComboBoxKeyWords;
     private javax.swing.JComboBox<String> jComboBoxOthers;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JEditorPane jPanelGraphviz;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel14;
@@ -1175,7 +1249,7 @@ public class UI extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanelReportTable;
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel24;
