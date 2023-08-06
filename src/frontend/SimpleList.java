@@ -1,5 +1,7 @@
 package frontend;
 
+import backend.Analyzer;
+
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
@@ -58,9 +60,12 @@ public class SimpleList {
 
         Node aux = first;
         while(aux!=null){
-            if(aux.getCharacter() == (char) 32 || aux.getCharacter() == (char) 10 || aux.getCharacter() == (char) 9){
-                text.append("\" \"");
-                text.append("->");
+            if(Analyzer.possibleString(aux.getCharacter()));
+            else if(Analyzer.isDelimiter(aux.getCharacter())){
+                text.append("\"").append(aux.getCharacter()).append("\"").append("->");
+            }
+            else if(Analyzer.isSpaceTab(aux.getCharacter()) || Analyzer.isLineBreak(aux.getCharacter())){
+                text.append("\" \"").append("->");
             }
             else {
                 text.append(aux.getCharacter()).append("->");
