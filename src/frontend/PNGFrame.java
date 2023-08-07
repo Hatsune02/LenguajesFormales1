@@ -13,7 +13,7 @@ public class PNGFrame {
         frame.setLayout(new BorderLayout());
         frame.setSize(500,300);
         frame.setLocationRelativeTo(null);
-
+        frame.setTitle("Gráfico del token");
         scroll = new JScrollPane(png);
         frame.add(BorderLayout.CENTER, scroll);
         frame.setVisible(true);

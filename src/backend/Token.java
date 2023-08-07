@@ -32,11 +32,10 @@ public class Token {
 
     @Override
     public String toString() {
-        return "Token{" +
-                "type=" + type +
-                ", lexem='" + lexem + '\'' +
-                ", row=" + (row+1) +
-                ", column=" + (column+1) +
-                '}'+'\n';
+        return type.getType() +
+                ", lexema: " + lexem +
+                ", línea: " + (row+1) +
+                ", columna: " + (column+1) +
+                '\n';
     }
 }

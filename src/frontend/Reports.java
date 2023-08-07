@@ -8,7 +8,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Reports {
-    String [] head = {"Lexema","Tipo","Línea","Columna"};
+    String [] head = {"Token","Lexema","Línea","Columna"};
     String [][] data;
     DefaultTableModel mod;
     JTable table;
@@ -23,14 +23,14 @@ public class Reports {
         table = new JTable(mod);
         JScrollPane scrollTable = new JScrollPane(table);
         panelTable.add(scrollTable);
-        table.getColumnModel().getColumn(1).setPreferredWidth(200);
-        table.getColumnModel().getColumn(2).setPreferredWidth(80);
-        table.getColumnModel().getColumn(3).setPreferredWidth(80);
-        /*jComponent.setBorder(BorderFactory.createMatteBorder(0,0,1,1, Color.CYAN));
-        jComponent.setOpaque(true);
-        jComponent.setBackground(new Color(236,234,219));
-        jComponent.setForeground(Color.white);
-        table.add(jComponent);*/
+
+        table.getTableHeader().setFont(new Font("Segoe UI",Font.BOLD,12));
+        table.getTableHeader().setOpaque(false);
+        table.getTableHeader().setBackground(new Color(32, 136, 203));
+        table.getTableHeader().setForeground(new Color(255,255,255));
+        table.setRowHeight(25);
+        table.getColumnModel().getColumn(2).setResizable(false);
+        table.getColumnModel().getColumn(3).setResizable(false);
 
     }
 
@@ -39,8 +39,8 @@ public class Reports {
         String [][] info = new String[tokens.size()][head.length];
 
         for (int i = 0; i < info.length; i++) {
-            info[i][0] = tokens.get(i).getLexem()+"";
-            info[i][1] = tokens.get(i).getType().getType()+"";
+            info[i][0] = tokens.get(i).getType().getType()+"";
+            info[i][1] = tokens.get(i).getLexem()+"";
             info[i][2] = String.valueOf(tokens.get(i).getRow()+1+"");
             info[i][3] = String.valueOf(tokens.get(i).getColumn()+1+"");
         }
