@@ -4,6 +4,7 @@ import backend.Analyzer;
 import backend.ReaderText;
 import backend.Token;
 import backend.TokenType;
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,8 +17,6 @@ public class UI extends javax.swing.JFrame {
     PNGFrame pngFrame;
     LineNumber lineNumber, lineNumber2, lineNumber3;
     Reports reports;
-/*    String comboBoxID,comboBoxArithmetic,comboBoxAssign,comboBoxComment,
-            comboBoxKeyWord, comboBoxComparison, comboBoxConstant, comboBoxOthers;*/
     String comboBoxText;
 
     public UI() {
@@ -25,16 +24,16 @@ public class UI extends javax.swing.JFrame {
         initComponents();
 
         setTitle("Parser-Py");
-        jComboBoxID.setEditable(true);
-        jComboBoxArithmetic.setEditable(true);
-        jComboBoxAssign.setEditable(true);
-        jComboBoxComment.setEditable(true);
-        jComboBoxKeyWords.setEditable(true);
-        jComboBoxComparison.setEditable(true);
-        jComboBoxConstant.setEditable(true);
-        jComboBoxOthers.setEditable(true);
-        jComboBoxLogics.setEditable(true);
-        jComboBoxErrors.setEditable(true);
+        AutoCompleteDecorator.decorate(jComboBoxID);
+        AutoCompleteDecorator.decorate(jComboBoxArithmetic);
+        AutoCompleteDecorator.decorate(jComboBoxAssign);
+        AutoCompleteDecorator.decorate(jComboBoxComment);
+        AutoCompleteDecorator.decorate(jComboBoxKeyWords);
+        AutoCompleteDecorator.decorate(jComboBoxComparison);
+        AutoCompleteDecorator.decorate(jComboBoxConstant);
+        AutoCompleteDecorator.decorate(jComboBoxOthers);
+        AutoCompleteDecorator.decorate(jComboBoxLogics);
+        AutoCompleteDecorator.decorate(jComboBoxErrors);
 
         jTextPaneError.setEditable(false );
         jTextAreaAbout.setText(about);
@@ -1104,13 +1103,7 @@ public class UI extends javax.swing.JFrame {
         changeReport(analyzer.filterArrayList(TokenType.ERROR));
     }
 
-
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
+    public static void InitUI(){
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Metal".equals(info.getName())) {
@@ -1127,9 +1120,7 @@ public class UI extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(UI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
 
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new UI().setVisible(true);

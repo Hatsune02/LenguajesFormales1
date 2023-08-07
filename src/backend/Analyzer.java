@@ -10,7 +10,7 @@ public class Analyzer {
         this.text = text + "\n";
     }
     public void analyze(){
-        System.out.println(s0(tokens,new StringBuilder(),0,0,0).toString());
+        s0(tokens,new StringBuilder(),0,0,0);
     }
     public ArrayList<Token> s0(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column){
         if(index >= text.length()) return tokens;
