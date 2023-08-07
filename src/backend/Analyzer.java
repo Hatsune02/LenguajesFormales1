@@ -30,7 +30,11 @@ public class Analyzer {
         char character = text.charAt(index);
         if(possibleIdentifier(lexeme.toString(),character)) return sPossibleIdentifier(tokens, lexeme.append(character), index+1, row, column+1,initialColumn, tokenIndex);
         if(isDelimiter(character)){
-            if(isKeyWord(lexeme.toString())) tokens.add(new Token(TokenType.KEYWORD, lexeme.toString(), row, initialColumn, tokenIndex));
+            if(isKeyWord(lexeme.toString())) {
+                tokens.add(new Token(TokenType.KEYWORD, lexeme.toString(), row, initialColumn, tokenIndex));
+                if(isLogic(lexeme.toString())) tokens.add(new Token(TokenType.LOGIC, lexeme.toString(), row, initialColumn, tokenIndex));
+                else if(isConstantString(lexeme.toString())) tokens.add(new Token(TokenType.CONSTANT, lexeme.toString(), row, initialColumn, tokenIndex));
+            }
             else tokens.add(new Token(TokenType.IDENTIFIER, lexeme.toString(), row, initialColumn, tokenIndex));
             return s0(tokens, new StringBuilder(),index,row,column);
         }
@@ -79,8 +83,7 @@ public class Analyzer {
             tokens.add(new Token(TokenType.CONSTANT, lexeme.toString(), row, initialColumn, tokenIndex));
             return s0(tokens, new StringBuilder(),index,row,column);
         }
-        //if(isPoint(character)) return sError(tokens,lexeme.append(character),index,row,column,initialColumn);
-        return sError(tokens,lexeme.append(character),index,row,column,initialColumn, tokenIndex);
+        return sErrorDecimal(tokens,lexeme.append(character),index+1,row,column+1,initialColumn, tokenIndex);
     }
     public ArrayList <Token> sPossibleString(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
         char character = text.charAt(index);
@@ -111,6 +114,14 @@ public class Analyzer {
         }
         return sError(tokens, lexeme.append(character),index+1,row,column+1, initialColumn, tokenIndex);
     }
+    public ArrayList<Token> sErrorDecimal(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
+        char character = text.charAt(index);
+        if(isDelimiterWithoutPoint(character)){
+            tokens.add(new Token(TokenType.ERROR,lexeme.toString(),row,initialColumn, tokenIndex));
+            return s0(tokens, new StringBuilder(),index,row,column);
+        }
+        return sErrorDecimal(tokens, lexeme.append(character),index+1,row,column+1, initialColumn, tokenIndex);
+    }
 
     //METODOS PARA FILTRAR LOS CARACTERES
     public static boolean isLetter(char letter){
@@ -140,7 +151,7 @@ public class Analyzer {
         return a=='#';
     }
     public static boolean isOther(char a){
-        return a=='('|| a==')'|| a=='{'|| a=='}'|| a=='['|| a==']'|| a==','|| a==';'|| a==':' || a=='.';
+        return a=='('|| a==')'|| a=='{'|| a=='}'|| a=='['|| a==']'|| a==','|| a==';'|| a==':';
     }
     public static boolean isSpaceTab(char a){
         return a==(char)9 || a==(char)32;
@@ -183,6 +194,16 @@ public class Analyzer {
                 "del" , "elif" , "else" , "except" , "False" , "finally" , "for" , "from" , "global" ,
                 "if" , "import" , "in" , "is" , "lambda" , "None" , "nonlocal" , "not" , "or" , "pass" ,
                 "raise" , "return" , "True" , "try" , "while" , "with" , "yield"};
+        for (String keyWord : keyWords) {if (lexeme.equals(keyWord)) return true;}
+        return false;
+    }
+    public static boolean isLogic(String lexeme){
+        String[] keyWords = {"and", "or","not"};
+        for (String keyWord : keyWords) {if (lexeme.equals(keyWord)) return true;}
+        return false;
+    }
+    public static boolean isConstantString(String lexeme){
+        String[] keyWords = {"True", "False"};
         for (String keyWord : keyWords) {if (lexeme.equals(keyWord)) return true;}
         return false;
     }
