@@ -102,7 +102,7 @@ public class PaintWords {
         for (Token token : analyzer.filterArrayList(TokenType.KEYWORD)) {
             paintPurple(token.getIndex(), token.getLexem().length());
         }
-        for (Token token : analyzer.filterArrayList(TokenType.CONSTANT)) {
+        for (Token token : analyzer.filterArrayList(TokenType.INT)) {
             paintOrange(token.getIndex(), token.getLexem().length());
         }
         for (Token token : analyzer.filterArrayList(TokenType.COMMENT)) {
@@ -111,6 +111,16 @@ public class PaintWords {
         for (Token token : analyzer.filterArrayList(TokenType.OTHERS)) {
             paintGreen(token.getIndex(), token.getLexem().length());
         }
+        for (Token token : analyzer.filterArrayList(TokenType.DECIMAL)) {
+            paintOrange(token.getIndex(), token.getLexem().length());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.STRING)) {
+            paintOrange(token.getIndex(), token.getLexem().length());
+        }
+        for (Token token : analyzer.filterArrayList(TokenType.LOGIC)) {
+            paintSkyBlue(token.getIndex(), token.getLexem().length());
+        }
+
 
     }
     //YYCHAR YYLENGTH
