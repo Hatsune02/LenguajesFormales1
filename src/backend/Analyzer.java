@@ -31,11 +31,10 @@ public class Analyzer {
         if(possibleIdentifier(lexeme.toString(),character)) return sPossibleIdentifier(tokens, lexeme.append(character), index+1, row, column+1,initialColumn, tokenIndex);
         if(isDelimiter(character)){
             if(isKeyWord(lexeme.toString())) {
-                tokens.add(new Token(TokenType.KEYWORD, lexeme.toString(), row, initialColumn, tokenIndex));
-                if(isLogic(lexeme.toString())) tokens.add(new Token(TokenType.LOGIC, lexeme.toString(), row, initialColumn, tokenIndex));
-                else if(isConstantString(lexeme.toString())) tokens.add(new Token(TokenType.CONSTANT, lexeme.toString(), row, initialColumn, tokenIndex));
+                tokens.add(new Token(TokenType.KEYWORD, lexeme.toString(), row, initialColumn, tokenIndex, Pattern.KEYWORD));
+                if(isLogic(lexeme.toString())) tokens.add(new Token(TokenType.LOGIC, lexeme.toString(), row, initialColumn, tokenIndex, Pattern.LOGIC));
             }
-            else tokens.add(new Token(TokenType.IDENTIFIER, lexeme.toString(), row, initialColumn, tokenIndex));
+            else tokens.add(new Token(TokenType.IDENTIFIER, lexeme.toString(), row, initialColumn, tokenIndex, Pattern.IDENTIFIER));
             return s0(tokens, new StringBuilder(),index,row,column);
         }
         return sError(tokens, lexeme.append(character), index+1, row, column+1, column, tokenIndex);
@@ -43,27 +42,27 @@ public class Analyzer {
     public ArrayList<Token> sPossibleArithmetic(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
         char character = text.charAt(index);
         if(possibleArithmetic(lexeme.toString(),character)){
-            tokens.add(new Token(TokenType.ARITHMETIC,lexeme.append(character).toString(),row,initialColumn, tokenIndex));
+            tokens.add(new Token(TokenType.ARITHMETIC,lexeme.append(character).toString(),row,initialColumn, tokenIndex,Pattern.ARITHMETIC));
             return s0(tokens,new StringBuilder(),index+1,row,column+1);
         }
         if(character == '='){
-            tokens.add(new Token(TokenType.ASSIGNMENT,lexeme.append(character).toString(),row,initialColumn, tokenIndex));
+            tokens.add(new Token(TokenType.ASSIGNMENT,lexeme.append(character).toString(),row,initialColumn, tokenIndex,Pattern.ASSIGNMENT));
             return s0(tokens,new StringBuilder(),index+1,row,column+1);
         }
-        tokens.add(new Token(TokenType.ARITHMETIC,lexeme.toString(),row,initialColumn, tokenIndex));
+        tokens.add(new Token(TokenType.ARITHMETIC,lexeme.toString(),row,initialColumn, tokenIndex,Pattern.ARITHMETIC));
         return s0(tokens, new StringBuilder(),index,row,column);
     }
     public ArrayList<Token> sPossibleComparison(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
         char character = text.charAt(index);
         if(possibleCompare(lexeme.toString(),character)){
-            tokens.add(new Token(TokenType.COMPARASION,lexeme.append(character).toString(),row,initialColumn, tokenIndex));
+            tokens.add(new Token(TokenType.COMPARASION,lexeme.append(character).toString(),row,initialColumn, tokenIndex,Pattern.COMPARASION));
             return s0(tokens,new StringBuilder(),index+1,row,column+1);
         }
         if(lexeme.toString().equals("=")){
-            tokens.add(new Token(TokenType.ASSIGNMENT,lexeme.toString(),row,initialColumn, tokenIndex));
+            tokens.add(new Token(TokenType.ASSIGNMENT,lexeme.toString(),row,initialColumn, tokenIndex,Pattern.ASSIGNMENT));
             return s0(tokens, new StringBuilder(),index,row,column);
         }
-        tokens.add(new Token(TokenType.COMPARASION,lexeme.toString(),row,initialColumn, tokenIndex));
+        tokens.add(new Token(TokenType.COMPARASION,lexeme.toString(),row,initialColumn, tokenIndex,Pattern.COMPARASION));
         return s0(tokens, new StringBuilder(),index,row,column);
     }
     public ArrayList<Token> sPossibleNumber(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
@@ -71,7 +70,7 @@ public class Analyzer {
         if(isNumber(character))return sPossibleNumber(tokens, lexeme.append(character), index+1, row, column+1, initialColumn, tokenIndex);
         if(isPoint(character))return sPossibleDecimal(tokens, lexeme.append(character), index+1,row,column+1,initialColumn, tokenIndex);
         if(isDelimiter(character)){
-            tokens.add(new Token(TokenType.CONSTANT, lexeme.toString(), row, initialColumn, tokenIndex));
+            tokens.add(new Token(TokenType.INT, lexeme.toString(), row, initialColumn, tokenIndex,Pattern.INT));
             return s0(tokens, new StringBuilder(),index,row,column);
         }
         return sError(tokens, lexeme.append(character), index+1, row, column+1, initialColumn, tokenIndex);
@@ -80,7 +79,7 @@ public class Analyzer {
         char character = text.charAt(index);
         if(isNumber(character)) return sPossibleDecimal(tokens,lexeme.append(character),index+1,row,column+1,initialColumn, tokenIndex);
         if(isDelimiterWithoutPoint(character)){
-            tokens.add(new Token(TokenType.CONSTANT, lexeme.toString(), row, initialColumn, tokenIndex));
+            tokens.add(new Token(TokenType.DECIMAL, lexeme.toString(), row, initialColumn, tokenIndex,Pattern.DECIMAL));
             return s0(tokens, new StringBuilder(),index,row,column);
         }
         return sErrorDecimal(tokens,lexeme.append(character),index+1,row,column+1,initialColumn, tokenIndex);
@@ -88,7 +87,7 @@ public class Analyzer {
     public ArrayList <Token> sPossibleString(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
         char character = text.charAt(index);
         if(lexeme.charAt(0)==(char)34 && character==(char)34 || lexeme.charAt(0)==(char)39 && character==(char)39){//comillas " 34 y comilla ' 39
-            tokens.add(new Token(TokenType.CONSTANT,lexeme.append(character).toString(),row,initialColumn, tokenIndex));
+            tokens.add(new Token(TokenType.STRING,lexeme.append(character).toString(),row,initialColumn, tokenIndex,Pattern.STRING));
             return s0(tokens,new StringBuilder(),index+1,row,column+1);
         }
         if(isLineBreak(character)) return sError(tokens,lexeme,index,row,column,initialColumn, tokenIndex);
@@ -97,19 +96,19 @@ public class Analyzer {
     public ArrayList<Token> sPossibleComment(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
         char character = text.charAt(index);
         if(isLineBreak(character)) {
-            tokens.add(new Token(TokenType.COMMENT,lexeme.toString(),row,initialColumn, tokenIndex));
+            tokens.add(new Token(TokenType.COMMENT,lexeme.toString(),row,initialColumn, tokenIndex,Pattern.COMMENT));
             return s0(tokens,new StringBuilder(),index,row,column);
         }
         return sPossibleComment(tokens,lexeme.append(character),index+1,row,column+1,initialColumn, tokenIndex);
     }
     public ArrayList<Token> sPossibleOthers(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
-        tokens.add(new Token(TokenType.OTHERS, lexeme.toString(),row,initialColumn, tokenIndex));
+        tokens.add(new Token(TokenType.OTHERS, lexeme.toString(),row,initialColumn, tokenIndex,Pattern.OTHERS));
         return s0(tokens, new StringBuilder(),index+1,row,column+1);
     }
     public ArrayList<Token> sError(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
         char character = text.charAt(index);
         if(isDelimiter(character)){
-            tokens.add(new Token(TokenType.ERROR,lexeme.toString(),row,initialColumn, tokenIndex));
+            tokens.add(new Token(TokenType.ERROR,lexeme.toString(),row,initialColumn, tokenIndex,Pattern.ERROR));
             return s0(tokens, new StringBuilder(),index,row,column);
         }
         return sError(tokens, lexeme.append(character),index+1,row,column+1, initialColumn, tokenIndex);
@@ -117,7 +116,7 @@ public class Analyzer {
     public ArrayList<Token> sErrorDecimal(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
         char character = text.charAt(index);
         if(isDelimiterWithoutPoint(character)){
-            tokens.add(new Token(TokenType.ERROR,lexeme.toString(),row,initialColumn, tokenIndex));
+            tokens.add(new Token(TokenType.ERROR,lexeme.toString(),row,initialColumn, tokenIndex,Pattern.ERROR));
             return s0(tokens, new StringBuilder(),index,row,column);
         }
         return sErrorDecimal(tokens, lexeme.append(character),index+1,row,column+1, initialColumn, tokenIndex);
@@ -198,12 +197,7 @@ public class Analyzer {
         return false;
     }
     public static boolean isLogic(String lexeme){
-        String[] keyWords = {"and", "or","not"};
-        for (String keyWord : keyWords) {if (lexeme.equals(keyWord)) return true;}
-        return false;
-    }
-    public static boolean isConstantString(String lexeme){
-        String[] keyWords = {"True", "False"};
+        String[] keyWords = {"and", "or","not","True","False"};
         for (String keyWord : keyWords) {if (lexeme.equals(keyWord)) return true;}
         return false;
     }
