@@ -98,9 +98,9 @@ public class SimpleList {
     public void drawGraphviz(){
 
         try{
-            writeFile("file.dot", graphvizList());
+            writeFile("files/file.dot", graphvizList());
             ProcessBuilder process;
-            process = new ProcessBuilder("dot","-Tpng","-o","token.png","file.dot");
+            process = new ProcessBuilder("dot","-Tpng","-o","files/token.png","files/file.dot");
 
             process.redirectErrorStream(true);
             process.start();

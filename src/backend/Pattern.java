@@ -1,10 +1,10 @@
 package backend;
 
 public enum Pattern {
-    IDENTIFIER("_?[a-zA-z]+_?\\w*"), ARITHMETIC("(\\/\\/)?(\\*\\*)?|[-+*\\/%]? "), COMPARASION("[!><]=?|(==)"),
+    IDENTIFIER("_?[a-zA-z]+_?\\w*"), ARITHMETIC("(\\/\\/)?(\\*\\*)?|[-+*\\/%]?"), COMPARASION("[!><]=?|(==)"),
     ASSIGNMENT("[0-9]+"), KEYWORD(""), CONSTANT("Constante"), LOGIC(""),
     INT("[0-9]+"), DECIMAL("[0-9]+\\.[0-9]+"), STRING("\".[^\"]+\"|'.[^']+'"),
-    COMMENT("#.*"), OTHERS("[\\[\\]\\(\\)\\{\\}]"), ERROR("No tiene");
+    COMMENT("#.*"), OTHERS("[\\[\\]\\(\\)\\{\\}\\.,;:]"), ERROR("No tiene");
     private String regEx;
 
     private Pattern(String regEx){

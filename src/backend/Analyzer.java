@@ -23,7 +23,7 @@ public class Analyzer {
         if(possibleConstant(character)) return sPossibleNumber(tokens, lexeme.append(character), index+1, row, column+1, column, index);
         if(possibleString(character)) return sPossibleString(tokens, lexeme.append(character), index+1, row, column+1, column, index);
         if(isComment(character)) return sPossibleComment(tokens, lexeme.append(character), index+1, row, column+1, column, index);
-        if(isOther(character)) return sPossibleOthers(tokens, lexeme.append(character), index, row, column, column, index);
+        if(isOther(character)||isPoint(character)) return sPossibleOthers(tokens, lexeme.append(character), index, row, column, column, index);
         else return sError(tokens, lexeme.append(character), index+1, row, column+1, column, index);
     }
     public ArrayList<Token> sPossibleIdentifier(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){

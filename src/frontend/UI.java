@@ -1177,55 +1177,55 @@ public class UI extends javax.swing.JFrame {
     }
 
     private void jButtonReportAllActionPerformed(java.awt.event.ActionEvent evt) {
-        changeReport(analyzer.getTokens());
+        try{changeReport(analyzer.getTokens());} catch (Exception e){}
     }
 
     private void jButtonReportIDActionPerformed(java.awt.event.ActionEvent evt) {
-        changeReport(analyzer.filterArrayList(TokenType.IDENTIFIER));
+        try{changeReport(analyzer.filterArrayList(TokenType.IDENTIFIER));} catch(Exception e){}
     }
 
     private void jButtonReportArithmeticActionPerformed(java.awt.event.ActionEvent evt) {
-        changeReport(analyzer.filterArrayList(TokenType.ARITHMETIC));
+        try{changeReport(analyzer.filterArrayList(TokenType.ARITHMETIC));} catch(Exception e){}
     }
 
     private void jButtonReportCompareActionPerformed(java.awt.event.ActionEvent evt) {
-        changeReport(analyzer.filterArrayList(TokenType.COMPARASION));
+        try{changeReport(analyzer.filterArrayList(TokenType.COMPARASION));} catch(Exception e){}
     }
 
     private void jButtonReportAssignActionPerformed(java.awt.event.ActionEvent evt) {
-        changeReport(analyzer.filterArrayList(TokenType.ASSIGNMENT));
+        try{changeReport(analyzer.filterArrayList(TokenType.ASSIGNMENT));} catch(Exception e){}
     }
 
     private void jButtonReportKeyWordActionPerformed(java.awt.event.ActionEvent evt) {
-        changeReport(analyzer.filterArrayList(TokenType.KEYWORD));
+        try{changeReport(analyzer.filterArrayList(TokenType.KEYWORD));} catch(Exception e){}
     }
 
     private void jButtonReportIntActionPerformed(java.awt.event.ActionEvent evt) {
-        changeReport(analyzer.filterArrayList(TokenType.INT));
+        try{changeReport(analyzer.filterArrayList(TokenType.INT));} catch(Exception e){}
     }
 
     private void jButtonReportOthersActionPerformed(java.awt.event.ActionEvent evt) {
-        changeReport(analyzer.filterArrayList(TokenType.OTHERS));
+        try{changeReport(analyzer.filterArrayList(TokenType.OTHERS));} catch(Exception e){}
     }
 
     private void jButtonReportLogicsActionPerformed(java.awt.event.ActionEvent evt) {
-        changeReport(analyzer.filterArrayList(TokenType.LOGIC));
+        try{changeReport(analyzer.filterArrayList(TokenType.LOGIC));} catch(Exception e){}
     }
 
     private void jButtonReportDecimalActionPerformed(java.awt.event.ActionEvent evt) {
-        changeReport(analyzer.filterArrayList(TokenType.DECIMAL));
+        try{changeReport(analyzer.filterArrayList(TokenType.DECIMAL));} catch(Exception e){}
     }
 
     private void jButtonReportStringActionPerformed(java.awt.event.ActionEvent evt) {
-        changeReport(analyzer.filterArrayList(TokenType.STRING));
+        try{changeReport(analyzer.filterArrayList(TokenType.STRING));} catch(Exception e){}
     }
 
     private void jButtonReportCommentActionPerformed(java.awt.event.ActionEvent evt) {
-        changeReport(analyzer.filterArrayList(TokenType.COMMENT));
+        try{changeReport(analyzer.filterArrayList(TokenType.COMMENT));} catch(Exception e){}
     }
 
     private void jButtonReportErrActionPerformed(java.awt.event.ActionEvent evt) {
-        changeReport(analyzer.filterArrayList(TokenType.ERROR));
+        try{changeReport(analyzer.filterArrayList(TokenType.ERROR));} catch(Exception e){}
     }
 
     public static void InitUI(){

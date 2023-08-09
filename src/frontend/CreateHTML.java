@@ -32,7 +32,7 @@ public class CreateHTML {
 
     public void createFile(){
         try{
-            writeFile("file.html", content());
+            writeFile("files/file.html", content());
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -40,7 +40,7 @@ public class CreateHTML {
 
     public void showHTML(JEditorPane panel){
         createFile();
-        File rec = new File("file.html");
+        File rec = new File("files/file.html");
         panel.setEditable(false);
         try {
             panel.setPage(rec.toURI().toURL());
