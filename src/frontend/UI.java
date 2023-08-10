@@ -71,7 +71,7 @@ public class UI extends javax.swing.JFrame {
     String about = "\n\nBienvenido a este analizador léxico llamado \"Parser-Py\".\n" +
             "\n" +
             "Esta es una primera version de un programa que analiza un lenguaje\n" +
-            "de programación inspirado en Python y tambiés será la primera parte\n" +
+            "de programación inspirado en Python y también será la primera parte\n" +
             "de una serie de programas los cuales al final crearan un analizador\n" +
             "tanto léxico como sintáctico lo más asemejable posible a Phyton.\n" +
             "\n" +
@@ -83,7 +83,7 @@ public class UI extends javax.swing.JFrame {
     String help = "Este programa cuenta con ciertas opciones las cuales serian buenas\n" +
             "repasar:\n" +
             "\n" +
-            "Cargar: La opción cargar aparece en el menú de la parte superior derecha\n" +
+            "Cargar: La opción cargar aparece en el menú de la parte superior izquierda\n" +
             "(File -> Cargar) y lo que hace es abrir un buscador en el cual podrá ingresar\n" +
             "solo archivos de texto (.txt). Se mostrará en un área de texto el cual podrá\n" +
             "ser editado en cualquier momento.\n" +

@@ -60,7 +60,12 @@ public class SimpleList {
 
         Node aux = first;
         while(aux!=null){
-            if(Analyzer.possibleString(aux.getCharacter()));
+            if(Analyzer.possibleString(aux.getCharacter())){
+                text.append("\"\\").append(aux.getCharacter()).append("\"").append("->");
+            }
+            else if(aux.getCharacter()=='\\'){
+                text.append("\"\\\\\"->");
+            }
             else if(Analyzer.isDelimiter(aux.getCharacter())){
                 text.append("\"").append(aux.getCharacter()).append("\"").append("->");
             }
@@ -70,6 +75,7 @@ public class SimpleList {
             else {
                 text.append(aux.getCharacter()).append("->");
             }
+
             aux = aux.getNext();
         }
         text.deleteCharAt(text.length()-1);
@@ -98,9 +104,9 @@ public class SimpleList {
     public void drawGraphviz(){
 
         try{
-            writeFile("files/file.dot", graphvizList());
+            writeFile("file.dot", graphvizList());
             ProcessBuilder process;
-            process = new ProcessBuilder("dot","-Tpng","-o","files/token.png","files/file.dot");
+            process = new ProcessBuilder("dot","-Tpng","-o","token.png","file.dot");
 
             process.redirectErrorStream(true);
             process.start();

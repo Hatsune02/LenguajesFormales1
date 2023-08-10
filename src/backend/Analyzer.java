@@ -52,7 +52,7 @@ public class Analyzer {
         tokens.add(new Token(TokenType.ARITHMETIC,lexeme.toString(),row,initialColumn, tokenIndex,Pattern.ARITHMETIC));
         return s0(tokens, new StringBuilder(),index,row,column);
     }
-    public ArrayList<Token> sPossibleComparison(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
+    public ArrayList<Token> sPossibleComparison(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex)   {
         char character = text.charAt(index);
         if(possibleCompare(lexeme.toString(),character)){
             tokens.add(new Token(TokenType.COMPARASION,lexeme.append(character).toString(),row,initialColumn, tokenIndex,Pattern.COMPARASION));
@@ -82,7 +82,7 @@ public class Analyzer {
             tokens.add(new Token(TokenType.DECIMAL, lexeme.toString(), row, initialColumn, tokenIndex,Pattern.DECIMAL));
             return s0(tokens, new StringBuilder(),index,row,column);
         }
-        return sErrorDecimal(tokens,lexeme.append(character),index+1,row,column+1,initialColumn, tokenIndex);
+        return sError(tokens,lexeme.append(character),index+1,row,column+1,initialColumn, tokenIndex);
     }
     public ArrayList <Token> sPossibleString(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
         char character = text.charAt(index);
@@ -107,19 +107,11 @@ public class Analyzer {
     }
     public ArrayList<Token> sError(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
         char character = text.charAt(index);
-        if(isDelimiter(character)){
-            tokens.add(new Token(TokenType.ERROR,lexeme.toString(),row,initialColumn, tokenIndex,Pattern.ERROR));
-            return s0(tokens, new StringBuilder(),index,row,column);
-        }
-        return sError(tokens, lexeme.append(character),index+1,row,column+1, initialColumn, tokenIndex);
-    }
-    public ArrayList<Token> sErrorDecimal(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
-        char character = text.charAt(index);
         if(isDelimiterWithoutPoint(character)){
             tokens.add(new Token(TokenType.ERROR,lexeme.toString(),row,initialColumn, tokenIndex,Pattern.ERROR));
             return s0(tokens, new StringBuilder(),index,row,column);
         }
-        return sErrorDecimal(tokens, lexeme.append(character),index+1,row,column+1, initialColumn, tokenIndex);
+        return sError(tokens, lexeme.append(character),index+1,row,column+1, initialColumn, tokenIndex);
     }
 
     //METODOS PARA FILTRAR LOS CARACTERES
