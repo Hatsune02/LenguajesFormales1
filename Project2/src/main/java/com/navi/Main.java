@@ -6,9 +6,10 @@ public class Main {
     public static void main(String[] args) {
         String text = """
                 hola
-                amigos
-                soy
-                yo""";
+                    amigos
+                        soy
+                        yo
+                xd""";
 
         Analyzer analyzer = new Analyzer(text);
         analyzer.analyze();

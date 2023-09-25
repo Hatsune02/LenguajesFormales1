@@ -1,7 +1,6 @@
 package com.navi.backend.lexer;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 import static com.navi.backend.utils.LexerMethods.*;
 
 public class Analyzer {
@@ -18,9 +17,10 @@ public class Analyzer {
     public ArrayList<Token> s0(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column){
         if(index >= text.length()) return tokens;
         char character = text.charAt(index);
-        if(isSpaceTab(character)) return s0(tokens, new StringBuilder(),index+1,row,column+1);
-        //if(isLineBreak(character)) return s0(tokens, new StringBuilder(),index+1,row+1,0);
-        if(isLineBreak(character)) return sLineBreak(tokens, lexeme.append(character),index,row,column,column,index);
+
+        if(isSpace(character)) return sSpace(tokens, index,row,column,column,index);
+        if(isTab(character)) return sIndent(tokens, index,row,column,column,index);
+        if(isLineBreak(character)) return sLineBreak(tokens,index,row,column,index);
         if(possibleIdentifier(lexeme.toString(), character)) return sPossibleIdentifier(tokens, lexeme.append(character), index+1, row, column+1, column, index);
         if(possibleArithmetic(lexeme.toString(), character)) return sPossibleArithmetic(tokens, lexeme.append(character), index+1, row, column+1, column, index);
         if((isCompare(character))) return sPossibleComparison(tokens, lexeme.append(character), index+1, row, column+1, column, index);
@@ -30,44 +30,47 @@ public class Analyzer {
         if(isOther(character)||isPoint(character)) return sPossibleOthers(tokens, lexeme.append(character), index, row, column, column, index);
         else return sError(tokens, lexeme.append(character), index+1, row, column+1, column, index);
     }
-    public ArrayList<Token> sLineBreak(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
-        tabs=0;
-        tokens.add(new Token(TokenType.LINEBREAK, lexeme.toString(),row,initialColumn,tokenIndex,Pattern.KEYWORD));
-        return s0(tokens, new StringBuilder(),index+1,row+1,0);
-    }
-    public ArrayList<Token> sSpace(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
-        char character = text.charAt(index);
-        char next1 = text.charAt(index+1);
-        char next2 = text.charAt(index+2);
-        char next3 = text.charAt(index+3);
-        boolean tab = false;
-        if(isSpace(character) && isSpace(next1)&&isSpace(next2) && isSpace(next3)){
-            tab = true;
+    public ArrayList<Token> sLineBreak(ArrayList<Token> tokens, int index, int row, int column, int tokenIndex){
+        tokens.add(new Token(TokenType.LINEBREAK, "\\n",row,column,tokenIndex,Pattern.KEYWORD));
+        if((index+1)<text.length()){
+            char after = text.charAt(index+1);
+            tabs=0;
+            if(!isTab(after) && !isTabAfter(text,index+1)){
+                for (int i = 0; i < indents; i++) {
+                    tokens.add(new Token(TokenType.DEDENT,"",row,column,tokenIndex,Pattern.KEYWORD));
+                }
+                indents = 0;
+            }
         }
-
-        tokens.add(new Token(TokenType.LINEBREAK, lexeme.toString(),row,initialColumn,tokenIndex,Pattern.KEYWORD));
         return s0(tokens, new StringBuilder(),index+1,row+1,0);
     }
-    public ArrayList<Token> sIndent(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
-        char before = text.charAt(index-1);
-        char character = text.charAt(index);
-        if(isLineBreak(before) && indents==0){
+    public ArrayList<Token> sSpace(ArrayList<Token> tokens, int index, int row, int column, int initialColumn, int tokenIndex){
+        if(isTabAfter(text,index)){
+            return sIndent(tokens, index+3,row,column,initialColumn,tokenIndex);
+        }
+        else{
+            return s0(tokens, new StringBuilder(),index+1,row,column+1);
+        }
+    }
+    public ArrayList<Token> sIndent(ArrayList<Token> tokens, int index, int row, int column, int initialColumn, int tokenIndex){
+        char after = text.charAt(index);
+
+        if(tabs==indents){
             indents++;
             tabs++;
+            tokens.add(new Token(TokenType.INDENT, "\\t",row,initialColumn,tokenIndex,Pattern.KEYWORD));
         }
-        if(isTab(before) && indents>0){
-
+        else if(tabs<indents){
+            tabs++;
         }
-        if(isTab(character) && indents==0){
-            indents++;
-            tokens.add(new Token(TokenType.INDENT, lexeme.toString(),row,initialColumn,tokenIndex,Pattern.KEYWORD));
-            return s0(tokens, new StringBuilder(),index+1,row+1,0);
+        if(!isTab(after) && !isTabAfter(text, index+1)){
+            int dedent = indents - tabs;
+            for (int i = 0; i < dedent; i++) {
+                tokens.add(new Token(TokenType.DEDENT,"",row,initialColumn,tokenIndex,Pattern.KEYWORD));
+            }
+            indents = indents - dedent;
         }
-        else if(isTab(character) && indents > 0){
-
-        }
-        tokens.add(new Token(TokenType.LINEBREAK, lexeme.toString(),row,initialColumn,tokenIndex,Pattern.KEYWORD));
-        return s0(tokens, new StringBuilder(),index+1,row+1,0);
+        return s0(tokens,new StringBuilder(),index+1,row,column+4);
     }
     public ArrayList<Token> sPossibleIdentifier(ArrayList<Token> tokens, StringBuilder lexeme, int index, int row, int column, int initialColumn, int tokenIndex){
         char character = text.charAt(index);

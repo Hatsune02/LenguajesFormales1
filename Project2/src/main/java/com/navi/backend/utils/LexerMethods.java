@@ -45,6 +45,17 @@ public class LexerMethods {
     public static boolean isTab(char a){
         return a==(char)9;
     }
+    public static boolean isTabAfter(String text,int index){
+        try{
+            char character = text.charAt(index);
+            char next1 = text.charAt(index+1);
+            char next2 = text.charAt(index+2);
+            char next3 = text.charAt(index+3);
+            return isSpace(character) && isSpace(next1) && isSpace(next2) && isSpace(next3);
+        }catch (Exception e){
+            return false;
+        }
+    }
     public static boolean isLineBreak(char a){
         return a==(char)10;
     }
