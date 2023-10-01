@@ -1,4 +1,4 @@
-package com.navi.backend.lexer;
+package com.navi.backend.tokens;
 
 import lombok.*;
 
@@ -6,15 +6,13 @@ import lombok.*;
 public class Token {
     private TokenType type;
     private final String lexeme;
-    private Pattern regEx;
     private final int row, column, index;
-    public Token(TokenType type, String lexeme, int row, int column, int index, Pattern regEx){
+    public Token(TokenType type, String lexeme, int row, int column, int index){
         this.type = type;
         this.lexeme = lexeme;
         this.row = row;
         this.column = column;
         this.index = index;
-        this.regEx = regEx;
     }
 
 
