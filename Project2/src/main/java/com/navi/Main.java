@@ -2,18 +2,19 @@ package com.navi;
 
 import com.navi.backend.lexer.*;
 import com.navi.backend.parser.PDA;
-import com.navi.backend.reports.Block;
-import com.navi.backend.reports.Function;
-import com.navi.backend.reports.Instruction;
 import com.navi.backend.reports.Symbol;
 import com.navi.backend.tokens.Token;
 import com.navi.backend.utils.ParserMethods;
+import com.navi.frontend.DashBoard;
 
 import java.util.ArrayList;
-import java.util.Stack;
 
 public class Main {
     public static void main(String[] args) {
+        DashBoard.initUI();
+        //test(); 0,232,200
+    }
+    public static void test(){
         String text = """
                     x=1x
                     y=2
@@ -61,6 +62,5 @@ public class Main {
         pda.analyze(0);
         if(pda.getError().isEmpty())System.out.println("NO HAY ERROR");
         else System.out.println(pda.getError());;
-
     }
 }
