@@ -1,7 +1,6 @@
 package com.navi.backend.utils;
 
-import com.navi.backend.tokens.Token;
-import com.navi.backend.tokens.TokenType;
+import com.navi.backend.tokens.*;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -56,6 +55,17 @@ public class LexerMethods {
             return false;
         }
     }
+    public static boolean isTabBefore(String text,int index){
+        try{
+            char character = text.charAt(index-1);
+            char next1 = text.charAt(index-2);
+            char next2 = text.charAt(index-3);
+            char next3 = text.charAt(index-4);
+            return isSpace(character) && isSpace(next1) && isSpace(next2) && isSpace(next3);
+        }catch (Exception e){
+            return false;
+        }
+    }
     public static boolean isLineBreak(char a){
         return a==(char)10;
     }
@@ -101,6 +111,9 @@ public class LexerMethods {
         String[] keyWords = {"and", "or","not","True","False"};
         for (String keyWord : keyWords) {if (lexeme.equals(keyWord)) return true;}
         return false;
+    }
+    public static boolean isBoolean(String lexeme){
+        return lexeme.equals("True") || lexeme.equals("False");
     }
     public static ArrayList<Token> filterArrayList(TokenType type, ArrayList<Token> tokens){
         return  (ArrayList<Token>) tokens.stream().filter(x -> x.getType().equals(type)).collect(Collectors.toList());

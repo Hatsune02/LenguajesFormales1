@@ -1,15 +1,20 @@
 package com.navi.backend.parser;
 
+import com.navi.backend.reports.Block;
 import com.navi.backend.tokens.*;
+import com.navi.backend.utils.LexerMethods;
+import com.navi.backend.utils.ParserMethods;
+
 import java.util.*;
 
 public class PDA {
     private static PDA automaton;
-    private String error;
+    private StringBuilder error;
     ArrayList<Token> tokens;
     private PDAState q0;
-    private PDA(){
-        error = "";
+    private PDA(ArrayList<Token> tokens){
+        setTokens(tokens);
+        error = new StringBuilder();
         q0 = new PDAState();
         PDAState q1 = new PDAState();
         PDAState q2 = new PDAState();
@@ -21,16 +26,115 @@ public class PDA {
 
         for(TokenType tk: TokenType.values()){
             if(!tk.equals(TokenType.$) && !tk.equals(TokenType.EPSILON)
-                    && !tk.equals(TokenType.COMMENT) && !tk.equals(TokenType.ERROR)){
+                    && !tk.equals(TokenType.COMMENT) && !tk.equals(TokenType.ERROR)
+                    && !tk.equals(TokenType.KEYWORD) && !tk.equals(TokenType.OTHERS)
+                    && !tk.equals(TokenType.ARITHMETIC)){
                 q2.addTransition(tk.toString(), tk.toString(), q2, true);
+            }
+        }
+        for(Token token:tokens){
+            if(token.getType()==TokenType.KEYWORD || token.getType()== TokenType.OTHERS || token.getType()==TokenType.ARITHMETIC){
+                q2.addTransition(token.getLexeme(),token.getLexeme(),q2,true);
             }
         }
 
         q2.addTransition(TokenType.$.toString(), TokenType.$.toString(), q3, true);
 
+        addTransitions(q2);
+    }
+
+    public static PDA getAutomaton(ArrayList<Token> tokens){
+        if(automaton == null){
+            automaton = new PDA(tokens);
+        }
+        //automaton.setTokens(tokens);
+        return automaton;
+    }
+
+    private void setTokens(ArrayList<Token> tokens) {
+        this.tokens = tokens;
+        this.tokens.add(new Token(TokenType.$, "$", 0,0,0));
+    }
+
+    public String getError() {
+        return error.toString();
+    }
+
+    public void analyze(int start){
+        Stack<String> stack = new Stack<String>();
+        //error = "";
+        int index = start;
+        PDAState aux, aux1;
+        aux = q0;
+        while(index < tokens.size()){
+            aux1 = aux.getState(TokenType.EPSILON.toString(), stack);
+            if(aux1 == null){
+                Token token = tokens.get(index);
+                if(token.getType()==TokenType.KEYWORD || token.getType()== TokenType.OTHERS || token.getType()==TokenType.ARITHMETIC){
+                    aux1 = aux.getState(token.getLexeme(), stack);
+                }
+                else aux1 = aux.getState(token.getType().toString(), stack);
+                System.out.println(token.getType().toString() + " " + token.getLexeme());
+                System.out.println(stack);
+                if(aux1 == null){
+                    token = tokens.get(index);
+                    error.append("Error linea: ").append(token.getRow()+1).append(" columna: ").append(token.getColumn()+1).append(" ").append(token.getLexeme()).append("\n");
+                    stack = resetStack();
+                    index = errorControl(index);
+                    token = tokens.get(index);
+                    if(token.getType()==TokenType.KEYWORD || token.getType()== TokenType.OTHERS || token.getType()==TokenType.ARITHMETIC){
+                        aux1 = aux.getState(token.getLexeme(), stack);
+                    }
+                    else aux1 = aux.getState(token.getType().toString(), stack);
+
+                }
+                else if(aux1.move()){
+                    index++;
+                }
+
+            }
+            if(stack.empty()){
+                break;
+            }
+            aux = aux1;
+        }
+    }
+
+    private int errorControl(int index){
+        Token token;
+        for (int i = index; i < tokens.size(); i++) {
+            token = tokens.get(i);
+            if(token.getType() == TokenType.LINEBREAK || token.getType() == TokenType.DEDENT){
+                if(i+1 < tokens.size()) return i+1;
+                else return i;
+            }
+        }
+        return index;
+    }
+
+    private Stack<String> resetStack(){
+        Stack<String> stack = new Stack<>();
+        stack.push("$");
+        stack.push("I");
+        return stack;
+    }
+
+    private void addTransitions(PDAState q2){
+        //FILA S
+        //String auxPush = "I;"+TokenType.$;
+        String auxPush = "I;";
+
+        q2.addTransition(TokenType.$.toString(),"S", auxPush, q2);
+        q2.addTransition(TokenType.IDENTIFIER.toString(),"S",auxPush, q2);
+        q2.addTransition("if","S",auxPush, q2);
+        q2.addTransition("for","S",auxPush, q2);
+        q2.addTransition("while","S",auxPush, q2);
+        q2.addTransition("def","S",auxPush, q2);
+
+
         // FILA INSTRUCTION <I>
         q2.addTransition(TokenType.$.toString(),"I", q2);
-        String auxPush = TokenType.IDENTIFIER + ";A;" + TokenType.LINEBREAK + ";I";
+        auxPush = TokenType.IDENTIFIER + ";A;" + TokenType.LINEBREAK + ";I";
         q2.addTransition(TokenType.IDENTIFIER.toString(),"I",auxPush, q2);
         q2.addTransition("if","I","Con;I", q2);
         q2.addTransition("for","I","For;I", q2);
@@ -100,6 +204,7 @@ public class PDA {
         q2.addTransition("(","Comp","Ep;CompP", q2);
         q2.addTransition(TokenType.BOOLEAN.toString(),"Comp","Ep;CompP", q2);
         q2.addTransition("-","Comp","Ep;CompP", q2);
+        q2.addTransition("not","Comp","not;Ep;CompP", q2);
         q2.addTransition(TokenType.STRING.toString(),"Comp","Ep;CompP", q2);
         q2.addTransition(TokenType.INT.toString(),"Comp","Ep;CompP", q2);
         q2.addTransition(TokenType.DECIMAL.toString(),"Comp","Ep;CompP", q2);
@@ -107,7 +212,7 @@ public class PDA {
         //FILA COMPARISON PRIMA <CompP>
         q2.addTransition("else","CompP", q2);
         q2.addTransition(":","CompP", q2);
-        auxPush = TokenType.COMPARASION + "Ep;CompP";
+        auxPush = TokenType.COMPARASION + ";Ep;CompP";
         q2.addTransition(TokenType.COMPARASION.toString(),"CompP",auxPush, q2);
 
         //FILA FOR <For>
@@ -124,7 +229,7 @@ public class PDA {
 
         //FILA PARAMETERS <Ps>
         q2.addTransition(TokenType.IDENTIFIER.toString(),"Ps","P", q2);
-        q2.addTransition(")","Ps","P", q2);
+        q2.addTransition(")","Ps", q2);
         q2.addTransition("*","Ps","*;args", q2);
 
         //FILA PARAMETER <P>
@@ -183,7 +288,7 @@ public class PDA {
 
         //FILA BODY DICTIONARY PRIMA <CDP>
         auxPush = ",;"+TokenType.IDENTIFIER+";:;E;CDP";
-        q2.addTransition(TokenType.IDENTIFIER.toString(),"CDP",auxPush, q2);
+        q2.addTransition(",","CDP",auxPush, q2);
         q2.addTransition("}","CDP", q2);
 
         //FILA EXPRESSION <E>
@@ -315,66 +420,5 @@ public class PDA {
         q2.addTransition(TokenType.INT.toString(), "Num",TokenType.INT.toString(),q2);
         q2.addTransition(TokenType.DECIMAL.toString(), "Num",TokenType.DECIMAL.toString(),q2);
 
-    }
-
-    public static PDA getAutomaton(ArrayList<Token> tokens){
-        if(automaton == null){
-            automaton = new PDA();
-        }
-        automaton.setTokens(tokens);
-        return automaton;
-    }
-
-    private void setTokens(ArrayList<Token> tokens) {
-        this.tokens = tokens;
-        this.tokens.add(new Token(TokenType.$, "$", 0,0,0));
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public void analyze(){
-        Stack<String> stack = new Stack<String>();
-        error = "";
-        int index = 0;
-        PDAState aux, aux1;
-        aux = q0;
-        while(index < tokens.size()){
-            aux1 = aux.getState(TokenType.EPSILON.toString(), stack);
-            if(aux1 == null){
-                Token tk = tokens.get(index);
-                aux1 = aux.getState(tk.getType().toString(), stack);
-                if(aux1 == null){
-                    //String valid = aux.getValidInputs();
-                    tk = tokens.get(index - 1);
-                    error = "Error ln:"  + tk.getRow() + " col:"+tk.getColumn()+" "+tk.getLexeme(); //+"\nSe esperaba " + valid;
-                    break;
-                }
-                else if(aux1.move()){
-                    index++;
-
-                }
-
-            }
-            if(stack.empty()){
-                break;
-            }else{
-                //System.out.println(stack);
-            }
-
-
-            /*
-            if(index == tokens.size()){
-                if(!aux1.isEndState()){
-                    Token tk = tokens.get(index - 2);
-                    //String valid = aux.getValidInputs();
-                    error = "Error ln:"  + tk.getRow() + " col:"+tk.getColumn() + " "+ tk.getLexeme();//+"\nSe esperaba " + valid;
-                    break;
-                }
-            }
-            */
-            aux = aux1;
-        }
     }
 }

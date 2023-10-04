@@ -1,2 +1,16 @@
-package com.navi.backend.reports;public class Function {
+package com.navi.backend.reports;
+
+import lombok.*;
+
+@Getter @Setter @ToString
+public class Function {
+    private String name;
+    private int references = 0;
+
+    public Function(String name) {
+        this.name = name;
+    }
+    public void addReference(){
+        references++;
+    }
 }

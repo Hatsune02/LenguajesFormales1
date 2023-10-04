@@ -10,7 +10,7 @@ public class Analyzer {
     int indents = 0 ,tabs = 0;
 
     public Analyzer(String text){
-        this.text = text + "\n";
+        this.text = text + "\n\n";
     }
     public void analyze(){
         s0(tokens,new StringBuilder(),0,0,0);
@@ -32,9 +32,13 @@ public class Analyzer {
         else return sError(tokens, lexeme.append(character), index+1, row, column+1, column, index);
     }
     public ArrayList<Token> sLineBreak(ArrayList<Token> tokens, int index, int row, int column, int tokenIndex){
-        tokens.add(new Token(TokenType.LINEBREAK, "\\n",row,column,tokenIndex));
+        if(index==0) return s0(tokens, new StringBuilder(),index+1,row+1,0);
+
+        char before = text.charAt(index-1);
+        if(!isLineBreak(before)) tokens.add(new Token(TokenType.LINEBREAK, "\\n",row,column,tokenIndex));
         if((index+1)<text.length()){
             char after = text.charAt(index+1);
+
             tabs=0;
             if(!isTab(after) && !isTabAfter(text,index+1)){
                 for (int i = 0; i < indents; i++) {
@@ -46,12 +50,9 @@ public class Analyzer {
         return s0(tokens, new StringBuilder(),index+1,row+1,0);
     }
     public ArrayList<Token> sSpace(ArrayList<Token> tokens, int index, int row, int column, int initialColumn, int tokenIndex){
-        if(isTabAfter(text,index)){
-            return sIndent(tokens, index+3,row,column,initialColumn,tokenIndex);
-        }
-        else{
-            return s0(tokens, new StringBuilder(),index+1,row,column+1);
-        }
+        if(isTabAfter(text,index)) return sIndent(tokens, index+3,row,column,initialColumn,tokenIndex);
+        else return s0(tokens, new StringBuilder(),index+1,row,column+1);
+
     }
     public ArrayList<Token> sIndent(ArrayList<Token> tokens, int index, int row, int column, int initialColumn, int tokenIndex){
         char after = text.charAt(index);
@@ -78,8 +79,9 @@ public class Analyzer {
         if(possibleIdentifier(lexeme.toString(),character)) return sPossibleIdentifier(tokens, lexeme.append(character), index+1, row, column+1,initialColumn, tokenIndex);
         if(isDelimiter(character)){
             if(isKeyWord(lexeme.toString())) {
-                tokens.add(new Token(TokenType.KEYWORD, lexeme.toString(), row, initialColumn, tokenIndex));
-                if(isLogic(lexeme.toString())) tokens.add(new Token(TokenType.LOGIC, lexeme.toString(), row, initialColumn, tokenIndex));
+                //if(isLogic(lexeme.toString())) tokens.add(new Token(TokenType.LOGIC, lexeme.toString(), row, initialColumn, tokenIndex));
+                if(isBoolean(lexeme.toString())) tokens.add(new Token(TokenType.BOOLEAN, lexeme.toString(), row, initialColumn, tokenIndex));
+                else tokens.add(new Token(TokenType.KEYWORD, lexeme.toString(), row, initialColumn, tokenIndex));
             }
             else tokens.add(new Token(TokenType.IDENTIFIER, lexeme.toString(), row, initialColumn, tokenIndex));
             return s0(tokens, new StringBuilder(),index,row,column);
