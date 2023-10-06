@@ -6,6 +6,7 @@ import lombok.*;
 public class Function {
     private String name;
     private int references = 0;
+    private String params;
 
     public Function(String name) {
         this.name = name;

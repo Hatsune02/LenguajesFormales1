@@ -3,7 +3,6 @@ package com.navi.backend.utils;
 import com.navi.backend.reports.*;
 import com.navi.backend.tokens.*;
 
-import java.net.FileNameMap;
 import java.util.ArrayList;
 
 public class ParserMethods {
@@ -12,17 +11,12 @@ public class ParserMethods {
         ArrayList<Symbol> symbols = new ArrayList<>();
 
         for (int i = index; i < indexF; i++) {
-            if(i+2 < tokens.size()){
+            if(i+1 < tokens.size() && i-1 > index){
+                Token tokenBefore = tokens.get(i-1);
                 Token token = tokens.get(i);
                 Token tokenAfter = tokens.get(i+1);
-                Token tokenValue = tokens.get(i+2);
-
-                if(token.getType() == TokenType.IDENTIFIER && tokenAfter.getType() == TokenType.ASSIGNMENT){
-                    symbols.removeIf(symbol -> token.getLexeme().equals(symbol.getName()));
-                    if(tokenValue.getLexeme().equals("[") || tokenValue.getLexeme().equals("{")){
-                        arrayOrDic(tokens,symbols,token,i+2);
-                    }
-                    else symbols.add(new Symbol(token.getLexeme(),tokenValue.getType().getType(),tokenValue.getLexeme(), token.getRow(),token.getColumn()));
+                if(!tokenBefore.getLexeme().equals("return") && token.getType() == TokenType.IDENTIFIER && !tokenAfter.getLexeme().equals("(")){
+                    i = analyzeLine(tokens,symbols,i);
                 }
                 else if(token.getLexeme().equals("def") && tokenAfter.getType()==TokenType.IDENTIFIER){
                     searchReturn(tokens,symbols,tokenAfter,i);
@@ -32,30 +26,80 @@ public class ParserMethods {
         }
         return symbols;
     }
-    public static void arrayOrDic(ArrayList<Token> tokens, ArrayList<Symbol> symbols, Token token, int i){
-        Token aux1 = tokens.get(i);
+    public static int analyzeLine(ArrayList<Token> tokens, ArrayList<Symbol> symbols, int i){
+        ArrayList<Token> line = new ArrayList<>();
+        for (int j = i; j < tokens.size(); j++) {
+            Token aux = tokens.get(j);
+            if(aux.getType() != TokenType.LINEBREAK) line.add(aux);
+            else break;
+        }
+        findSymbols(line,symbols);
+        return i + line.size();
+    }
+    public static void findSymbols(ArrayList<Token> line, ArrayList<Symbol> symbols){
         StringBuilder value = new StringBuilder();
-        String end,type;
-        if(aux1.getLexeme().equals("[")) {
-            end = "]";
-            type = "Arreglo";
-        }
-        else {
-            end = "}";
-            type = "Diccionario";
-        }
-        for (int j = 0; j < tokens.size()-i; j++) {
-            if(i+j < tokens.size()){
-                Token aux2 = tokens.get(i+j);
-                if(aux2.getLexeme().equals(end)){
-                    value.append(end);
-                    break;
+        var tokensId = new ArrayList<Token>();
+        var tokensValue = new ArrayList<Token>();
+        var values = new ArrayList<Values>();
+        int indexAssign = 0;
+        boolean isAssign = false;
+
+        tokensId.add(line.get(0));
+        for (int j = 1; j < line.size(); j++) {
+            Token aux = line.get(j);
+            if(j+1 < line.size()){
+                Token auxAfter = line.get(j+1);
+                if(aux.getLexeme().equals(",") && auxAfter.getType()==TokenType.IDENTIFIER){
+                    tokensId.add(auxAfter);
                 }
-                if(aux2.getLexeme().equals(",")) value.append(", ");
-                else value.append(aux2.getLexeme());
+            }
+            if(aux.getType()==TokenType.ASSIGNMENT){
+                isAssign = true;
+                indexAssign = j;
+                break;
             }
         }
-        symbols.add(new Symbol(token.getLexeme(),type,value.toString(),token.getRow(),token.getColumn()));
+        int functions = 0;
+        int arrays = 0;
+        int dictionaries = 0;
+        Token assign = line.get(indexAssign);
+        for (int i = indexAssign+1; i < line.size(); i++) {
+            Token aux = line.get(i);
+            String l = aux.getLexeme();
+            if(isAssign){
+                if(aux.getType()==TokenType.ASSIGNMENT){
+                    tokensValue = new ArrayList<>();
+                    value = new StringBuilder();
+                }
+                if(l.equals("(")) functions++;
+                if(l.equals("[")) arrays++;
+                if(l.equals("{")) dictionaries++;
+
+                if(l.equals(")")) functions--;
+                if(l.equals("]")) arrays--;
+                if(l.equals("}")) dictionaries--;
+
+                if(aux.getLexeme().equals(",") && (functions==0 && arrays==0 && dictionaries==0)){
+                    values.add(new Values(tokensValue, assign));
+                    tokensValue = new ArrayList<>();
+                    value = new StringBuilder();
+                }
+                else {
+                    tokensValue.add(aux);
+                    value.append(aux.getLexeme());
+                }
+            }
+            else break;
+        }
+        values.add(new Values(tokensValue,assign));
+        if(tokensId.size() == values.size()){
+            for (int i = 0; i < values.size(); i++) {
+                Token id = tokensId.get(i);
+                Values v = values.get(i);
+                v.viewToken(id);
+                symbols.add(new Symbol(id.getLexeme(),v.getType(),v.getValue(), id.getRow(), id.getColumn()));
+            }
+        }
     }
     public static void param(ArrayList<Token> tokens,ArrayList<Symbol> symbols,int i){
         for (int j = 0; j < tokens.size()-i; j++) {
@@ -195,12 +239,14 @@ public class ParserMethods {
         ArrayList<Function> functions = new ArrayList<>();
         StringBuilder body = new StringBuilder();
         for (int i = 0; i < tokens.size(); i++) {
-            if(i+1 < tokens.size()){
+            if(i+3 < tokens.size()){
                 Token token =  tokens.get(i);
-                Token tokenAfter = tokens.get(i+1);
+                Token tokenId = tokens.get(i+1);
                 if(token.getLexeme().equals("def")){
-                    functions.removeIf(fun -> tokenAfter.getLexeme().equals(fun.getName()));
-                    functions.add(new Function(tokenAfter.getLexeme()));
+                    functions.removeIf(fun -> tokenId.getLexeme().equals(fun.getName()));
+                    Function fun = new Function(tokenId.getLexeme());
+                    fun.setParams(param(tokens,i+3));
+                    functions.add(fun);
                 }
             }
         }
@@ -219,5 +265,16 @@ public class ParserMethods {
             }
         }
         return functions;
+    }
+    public static String param(ArrayList<Token> tokens,int i){
+        StringBuilder param = new StringBuilder();
+        for (int j = i; j < tokens.size()-i; j++) {
+            Token aux = tokens.get(j);
+            if(aux.getLexeme().equals(")")){
+                break;
+            }
+            param.append(aux.getLexeme());
+        }
+        return param.toString();
     }
 }

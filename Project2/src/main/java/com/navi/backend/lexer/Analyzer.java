@@ -128,7 +128,8 @@ public class Analyzer {
         char character = text.charAt(index);
         if(isNumber(character)) return sPossibleDecimal(tokens,lexeme.append(character),index+1,row,column+1,initialColumn, tokenIndex);
         if(isDelimiterWithoutPoint(character)){
-            tokens.add(new Token(TokenType.DECIMAL, lexeme.toString(), row, initialColumn, tokenIndex));
+            tokens.add(new Token(TokenType.INT, lexeme.toString(), row, initialColumn, tokenIndex));
+            //tokens.add(new Token(TokenType.DECIMAL, lexeme.toString(), row, initialColumn, tokenIndex));
             return s0(tokens, new StringBuilder(),index,row,column);
         }
         return sError(tokens,lexeme.append(character),index+1,row,column+1,initialColumn, tokenIndex);

@@ -62,7 +62,6 @@ public class PDA {
 
     public void analyze(int start){
         Stack<String> stack = new Stack<String>();
-        //error = "";
         int index = start;
         PDAState aux, aux1;
         aux = q0;
@@ -76,8 +75,8 @@ public class PDA {
                 else aux1 = aux.getState(token.getType().toString(), stack);
                 System.out.println(token.getType().toString() + " " + token.getLexeme());
                 System.out.println(stack);
+
                 if(aux1 == null){
-                    token = tokens.get(index);
                     error.append("Error linea: ").append(token.getRow()+1).append(" columna: ").append(token.getColumn()+1).append(" ").append(token.getLexeme()).append("\n");
                     stack = resetStack();
                     index = errorControl(index);
@@ -89,6 +88,36 @@ public class PDA {
 
                 }
                 else if(aux1.move()){
+                    if(index+1< tokens.size() && index-1 > 0){
+                        Token tokenA = tokens.get(index+1);
+                        Token tokenB = tokens.get(index-1);
+                        if(token.getType()==TokenType.STRING){
+                            if(tokenB.getLexeme().equals("-")){
+                                error.append("Error linea: ").append(tokenB.getRow()+1).append(" columna: ").append(tokenB.getColumn()+1).append(" ").append(tokenB.getLexeme()).append("\n");
+                                stack = resetStack();
+                                index = errorControl(index);
+                                token = tokens.get(index);
+                                if(token.getType()==TokenType.KEYWORD || token.getType()== TokenType.OTHERS || token.getType()==TokenType.ARITHMETIC){
+                                    aux1 = aux.getState(token.getLexeme(), stack);
+                                }
+                                else aux1 = aux.getState(token.getType().toString(), stack);
+                                index--;
+                            }
+                            else if(tokenA.getLexeme().equals("-")){
+                                error.append("Error linea: ").append(tokenA.getRow()+1).append(" columna: ").append(tokenA.getColumn()+1).append(" ").append(tokenA.getLexeme()).append("\n");
+                                stack = resetStack();
+                                index = errorControl(index);
+                                token = tokens.get(index);
+                                if(token.getType()==TokenType.KEYWORD || token.getType()== TokenType.OTHERS || token.getType()==TokenType.ARITHMETIC){
+                                    aux1 = aux.getState(token.getLexeme(), stack);
+                                }
+                                else aux1 = aux.getState(token.getType().toString(), stack);
+                                index--;
+                            }
+
+
+                        }
+                    }
                     index++;
                 }
 
@@ -161,7 +190,7 @@ public class PDA {
 
         //FILA ASSIGN PRIMA <AssignP>
         q2.addTransition(TokenType.ASSIGNMENT.toString(),"AssignP",TokenType.ASSIGNMENT.toString(), q2);
-        auxPush = ",;"+TokenType.IDENTIFIER+";AssignP;E";
+        auxPush = ",;"+TokenType.IDENTIFIER+";AssignP;E;,";
         q2.addTransition(",","AssignP",auxPush, q2);
 
         //FILA TERNARY OPERATOR <OT>

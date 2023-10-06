@@ -11,16 +11,18 @@ import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {
-        DashBoard.initUI();
-        //test(); 0,232,200
+        //DashBoard.initUI();
+        test(); //0,232,200
     }
     public static void test(){
         String text = """
-                    x=1x
-                    y=2
-                    z=3
-                    a=[1,2
-                    
+                    x,t="xd"+1,3
+                    y*=2+1
+                    z=[2,2]
+                    h=x()
+                    o={id:3,m:"hola"}
+                    def mostrar()
+                        return id
                     """;
 
         Analyzer analyzer = new Analyzer(text);
@@ -59,7 +61,7 @@ public class Main {
         }*/
 
         PDA pda = PDA.getAutomaton(analyzer.getTokens());
-        pda.analyze(0);
+        //pda.analyze(0);
         if(pda.getError().isEmpty())System.out.println("NO HAY ERROR");
         else System.out.println(pda.getError());;
     }
