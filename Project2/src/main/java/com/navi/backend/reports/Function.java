@@ -7,9 +7,11 @@ public class Function {
     private String name;
     private int references = 0;
     private String params;
+    private int row;
 
-    public Function(String name) {
+    public Function(String name, int row) {
         this.name = name;
+        this.row = row;
     }
     public void addReference(){
         references++;

@@ -9,7 +9,9 @@ public class ReaderText {
 
         JFileChooser load = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Carga de datos", "txt");
+        FileNameExtensionFilter filter1 = new FileNameExtensionFilter("Carga de datos", "py");
         load.setFileFilter(filter);
+        load.setFileFilter(filter1);
         load.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         load.showOpenDialog(null);
 

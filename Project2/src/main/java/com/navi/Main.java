@@ -2,7 +2,7 @@ package com.navi;
 
 import com.navi.backend.lexer.*;
 import com.navi.backend.parser.PDA;
-import com.navi.backend.reports.Symbol;
+import com.navi.backend.reports.*;
 import com.navi.backend.tokens.Token;
 import com.navi.backend.utils.ParserMethods;
 import com.navi.frontend.DashBoard;
@@ -11,18 +11,15 @@ import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {
-        //DashBoard.initUI();
-        test(); //0,232,200
+        DashBoard.initUI();
+        //test(); //0,232,200
     }
     public static void test(){
         String text = """
-                    x,t="xd"+1,3
-                    y*=2+1
-                    z=[2,2]
-                    h=x()
-                    o={id:3,m:"hola"}
-                    def mostrar()
-                        return id
+                    a=1
+                    def         mostrar():
+                        b = -3
+                        z = 1
                     """;
 
         Analyzer analyzer = new Analyzer(text);
@@ -35,7 +32,6 @@ public class Main {
         for(Symbol xd : ParserMethods.symbols(tokens,0,tokens.size())){
             System.out.println(xd.toString());
         }
-        /*System.out.println("");
         ArrayList<Block>blocks = ParserMethods.blocks(tokens);
         for(Block block:blocks){
             System.out.println(block.toString());
@@ -43,10 +39,12 @@ public class Main {
                 System.out.println(xd.toString());
             }
         }
+        System.out.println("");
         ArrayList<Instruction> instructions = ParserMethods.instructions(tokens,0,tokens.size());
         for(Instruction instruction:instructions){
             System.out.println(instruction.toString());
         }
+        /*
         System.out.println("");
         for(Block block:blocks){
             for(Instruction instruction:ParserMethods.instructions(tokens,block.getIndex(),block.getIndexF())){

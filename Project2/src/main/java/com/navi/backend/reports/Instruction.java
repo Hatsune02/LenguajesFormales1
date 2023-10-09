@@ -8,8 +8,8 @@ public class Instruction {
     private String body;
 
     public Instruction(int row, String body,int column) {
-        this.row = row+1;
+        this.row = row;
         this.body = body;
-        this.column = column+1;
+        this.column = column;
     }
 }

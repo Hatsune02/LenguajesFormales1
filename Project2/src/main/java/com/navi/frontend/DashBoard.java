@@ -1,15 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package com.navi.frontend;
 
-
+import com.navi.backend.read.ReaderText;
 import com.navi.frontend.views.*;
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.*;
-import com.formdev.flatlaf.intellijthemes.*;
+
 import java.awt.*;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 
 /**
@@ -17,18 +13,20 @@ import javax.swing.JPanel;
  * @author dog
  */
 public class DashBoard extends javax.swing.JFrame {
+    PrincipalPanel principalPanel = new PrincipalPanel();
+    ParserPanel parserPanel;
+    ReportsPanel reportsPanel = new ReportsPanel();
 
-    Principal principalPanel = new Principal();
-    Parser parserPanel = new Parser();
-    Reports reportsPanel = new Reports();
-    
     public DashBoard() {
+        parserPanel = new ParserPanel(reportsPanel);
         initComponents();
         initStyles();
-        showJPanel(parserPanel);
+        showJPanel(principalPanel);
+
     }
 
     private void initStyles(){
+        setTitle("Parser-Py");
         nameLabel.putClientProperty("FlatLaf.style","font: 34 $semibold.font");
         nameLabel.setForeground(Color.WHITE);
         menuLabel.putClientProperty("FlatLaf.style","font: bold $h1.regular.font");
@@ -214,6 +212,11 @@ public class DashBoard extends javax.swing.JFrame {
         jMenu1.setText("Archivo");
 
         uploadFile.setText("Cargar Archivos");
+        uploadFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uploadFileActionPerformed(evt);
+            }
+        });
         jMenu1.add(uploadFile);
 
         jMenuBar1.add(jMenu1);
@@ -237,24 +240,37 @@ public class DashBoard extends javax.swing.JFrame {
 
     private void principalButtonMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_principalButtonMenuActionPerformed
         showJPanel(principalPanel);
-    }//GEN-LAST:event_principalButtonMenuActionPerformed
+    }
 
     private void parserButtonMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parserButtonMenuActionPerformed
         showJPanel(parserPanel);
-    }//GEN-LAST:event_parserButtonMenuActionPerformed
+    }
 
     private void reportButtonMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reportButtonMenuActionPerformed
+        if(!parserPanel.errors.isEmpty()){
+            String alert = """
+                                SE ENCONTRARON ERRORES AL ANALIZAR EL TEXTO
+                    SE RECOMIENDA QUE PARA VER LOS REPORTES NO EXISTA NINGUN ERROR.
+                    
+                    LOS REPORTES QUE SE MUESTRA A CONTINUACIÓN PUEDEN LLEGAR A NO
+                    TENER SENTIDO.
+                                            """;
+            JOptionPane err = new JOptionPane(alert,JOptionPane.WARNING_MESSAGE);
+            JDialog dialog = err.createDialog("ADVERTENCIA");
+            dialog.setAlwaysOnTop(true);
+            dialog.setVisible(true);
+        }
         showJPanel(reportsPanel);
-    }//GEN-LAST:event_reportButtonMenuActionPerformed
+        reportsPanel.symbolsReport.initTable();
+    }
+    private void uploadFileActionPerformed(java.awt.event.ActionEvent evt) {
+        parserPanel.textPaneParser.setText(ReaderText.Read());
+    }
 
-    
-    
     public static void initUI() {
-        /* Set the Nimbus look and feel */
         //FlatMaterialLighterIJTheme.setup();
         FlatMaterialDarkerIJTheme.setup();
-        
-        /* Create and display the form */
+
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new DashBoard().setVisible(true);
@@ -262,7 +278,6 @@ public class DashBoard extends javax.swing.JFrame {
         });
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel background;
     private JPanel contentPanel;
     private javax.swing.JMenu jMenu1;
@@ -276,5 +291,4 @@ public class DashBoard extends javax.swing.JFrame {
     private javax.swing.JButton reportButtonMenu;
     private javax.swing.JLabel separator;
     private javax.swing.JMenuItem uploadFile;
-    // End of variables declaration//GEN-END:variables
 }

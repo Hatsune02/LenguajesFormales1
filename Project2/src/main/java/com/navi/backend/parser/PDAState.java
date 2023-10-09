@@ -6,14 +6,14 @@ import java.util.*;
 
 @Getter @Setter
 public class PDAState {
-    private String[] freshProductions;
+    private String[] actualProductions;
     private HashMap<String, StatePush> nextStates;
     private ArrayList<String> validInputs;
     private boolean endState;
     private boolean move;
     public PDAState(){
-        nextStates = new HashMap<String, StatePush>();
-        validInputs = new ArrayList<String>();
+        nextStates = new HashMap<>();
+        validInputs = new ArrayList<>();
         endState = false;
     }
 
@@ -21,8 +21,8 @@ public class PDAState {
         return move;
     }
 
-    public String[] getFreshProductions() {
-        return freshProductions;
+    public String[] getActualProductions() {
+        return actualProductions;
     }
 
     public boolean isEndState() {
@@ -56,7 +56,6 @@ public class PDAState {
         nextStates.put(getKey(input, stackPop), new StatePush(stackPush, state));
         addInput(input);
     }
-
 
     /**
      * @param input input del para transición
@@ -102,7 +101,7 @@ public class PDAState {
                 this.move = stateP.move;
                 stack.pop();
                 pushElements(stack, stateP.stackPush);
-                this.freshProductions = stateP.stackPush;
+                this.actualProductions = stateP.stackPush;
                 return stateP.state;
             }
         }

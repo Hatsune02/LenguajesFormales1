@@ -14,7 +14,7 @@ public class Symbol {
         this.name = name;
         this.type = type;
         this.value = value;
-        this.row = row+1;
-        this.column = column+1;
+        this.row = row;
+        this.column = column;
     }
 }

@@ -69,26 +69,24 @@ public class LexerMethods {
     public static boolean isLineBreak(char a){
         return a==(char)10;
     }
-    public static boolean possibleIdentifier(String lexeme, char letter){
-        if(lexeme.equals("")){
-            return letter == (char) 95 || isLetter(letter);
-        }
-        else{
-            return letter == (char) 95 || isLetter(letter) || isNumber(letter);
-        }
+    public static boolean possibleIdentifier(char letter){
+        return letter == (char) 95 || isLetter(letter) || isNumber(letter);
     }
-    public static boolean possibleArithmetic(String lexeme, char letter){
-        return switch (lexeme) {
-            case "" -> isArithmetic(letter);
-            case "*" -> letter == '*';
-            case "/" -> letter == '/';
+    public static boolean possibleIdentifierI(char letter){
+        return letter == (char) 95 || isLetter(letter);
+    }
+
+    public static boolean possibleArithmetic(char before, char letter){
+        return switch (before) {
+            case '*' -> letter == '*';
+            case '/' -> letter == '/';
             default -> false;
         };
     }
-    public static boolean possibleCompare(String lexeme, char letter){
-        return switch (lexeme) {
-            case "" -> isCompare(letter);
-            case "=", "!", ">", "<" -> letter == '=';
+
+    public static boolean possibleCompare(char before, char letter){
+        return switch (before) {
+            case '=', '!', '>', '<' -> letter == '=';
             default -> false;
         };
     }
@@ -100,7 +98,7 @@ public class LexerMethods {
         return letter == (char) 34 || letter == (char) 39;
     }
     public static boolean isKeyWord(String lexeme){
-        String[] keyWords = {"args","and", "as" , "assert" , "break" , "class" , "continue" , "def" ,
+        String[] keyWords = {"args", "and", "as" , "assert" , "break" , "class" , "continue" , "def" ,
                 "del" , "elif" , "else" , "except" , "False" , "finally" , "for" , "from" , "global" ,
                 "if" , "import" , "in" , "is" , "lambda" , "None" , "nonlocal" , "not" , "or" , "pass" ,
                 "raise" , "return" , "True" , "try" , "while" , "with" , "yield"};
@@ -108,7 +106,8 @@ public class LexerMethods {
         return false;
     }
     public static boolean isLogic(String lexeme){
-        String[] keyWords = {"and", "or","not","True","False"};
+        //String[] keyWords = {"and", "or","not","True","False"};
+        String[] keyWords = {"and", "or"};
         for (String keyWord : keyWords) {if (lexeme.equals(keyWord)) return true;}
         return false;
     }

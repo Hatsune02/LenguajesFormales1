@@ -11,7 +11,7 @@ public class Block {
         this.name = name;
         this.indents = indents;
         this.index = index;
-        this.row = row+1;
-        this.column = column+1;
+        this.row = row;
+        this.column = column;
     }
 }

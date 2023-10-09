@@ -11,6 +11,17 @@ public class ParserMethods {
         ArrayList<Symbol> symbols = new ArrayList<>();
 
         for (int i = index; i < indexF; i++) {
+            if(i==0){
+                Token token = tokens.get(i);
+                Token tokenAfter = tokens.get(i+1);
+                if(token.getType() == TokenType.IDENTIFIER && !tokenAfter.getLexeme().equals("(")){
+                    i = analyzeLine(tokens,symbols,i);
+                }
+                else if(token.getLexeme().equals("def") && tokenAfter.getType()==TokenType.IDENTIFIER){
+                    searchReturn(tokens,symbols,tokenAfter,i);
+                    param(tokens,symbols,i);
+                }
+            }
             if(i+1 < tokens.size() && i-1 > index){
                 Token tokenBefore = tokens.get(i-1);
                 Token token = tokens.get(i);
@@ -23,6 +34,8 @@ public class ParserMethods {
                     param(tokens,symbols,i);
                 }
             }
+
+
         }
         return symbols;
     }
@@ -145,8 +158,16 @@ public class ParserMethods {
                 Token auxToken = tokens.get(i+j);
                 Token value = tokens.get(i+j+1);
                 if(indents == 1 && auxToken.getLexeme().equals("return")){
+                    StringBuilder val = new StringBuilder();
+                    for (int k = i+j+1; k < tokens.size(); k++) {
+                        Token token1 = tokens.get(k);
+                        if (token1.getType()!=TokenType.LINEBREAK){
+                            if(token1.getType()!= TokenType.COMMENT) val.append(token1.getLexeme());
+                        }
+                        else break;
+                    }
                     symbols.removeIf(symbol -> token.getLexeme().equals(symbol.getName()));
-                    symbols.add(new Symbol(token.getLexeme(),"Función",value.getLexeme(),token.getRow(),token.getColumn()));
+                    symbols.add(new Symbol(token.getLexeme(),"Función",val.toString(),token.getRow(),token.getColumn()));
                     found = true;
                     break;
                 }
@@ -176,7 +197,7 @@ public class ParserMethods {
                         else name.append(aux.getLexeme());
 
                         if(aux.getLexeme().equals(":")){
-                            index = i+j+2;
+                            index = i+j+1;
                             break;
                         }
                     }
@@ -220,15 +241,20 @@ public class ParserMethods {
     public static ArrayList<Instruction> instructions(ArrayList<Token> tokens, int index, int indexF){
         ArrayList<Instruction> instructions = new ArrayList<>();
         StringBuilder body = new StringBuilder();
+        Token first = tokens.get(index);
         for (int i = index; i < indexF; i++) {
             Token token = tokens.get(i);
 
             if(token.getType()==TokenType.LINEBREAK){
-                instructions.add(new Instruction(token.getRow(),body.toString(),token.getColumn()));
+                instructions.add(new Instruction(first.getRow(),body.toString(),first.getColumn()));
                 body = new StringBuilder();
+                if(i+1 < indexF) first = tokens.get(i+1);
             }
-            else if(token.getType()!=TokenType.INDENT && token.getType()!=TokenType.DEDENT){
-                if(token.getType()==TokenType.KEYWORD) body.append(" ").append(token.getLexeme()).append(" ");
+            else if(token.getType()!=TokenType.INDENT && token.getType()!=TokenType.DEDENT && token.getType()!=TokenType.COMMENT){
+                if(token.getType()==TokenType.KEYWORD) {
+                    if(body.isEmpty()) body.append(token.getLexeme()).append(" ");
+                    else body.append(" ").append(token.getLexeme()).append(" ");
+                }
                 else if(token.getLexeme().equals(",")) body.append(token.getLexeme()).append(" ");
                 else body.append(token.getLexeme());
             }
@@ -237,14 +263,13 @@ public class ParserMethods {
     }
     public static ArrayList<Function> functions(ArrayList<Token> tokens){
         ArrayList<Function> functions = new ArrayList<>();
-        StringBuilder body = new StringBuilder();
         for (int i = 0; i < tokens.size(); i++) {
             if(i+3 < tokens.size()){
                 Token token =  tokens.get(i);
                 Token tokenId = tokens.get(i+1);
                 if(token.getLexeme().equals("def")){
                     functions.removeIf(fun -> tokenId.getLexeme().equals(fun.getName()));
-                    Function fun = new Function(tokenId.getLexeme());
+                    Function fun = new Function(tokenId.getLexeme(),tokenId.getRow());
                     fun.setParams(param(tokens,i+3));
                     functions.add(fun);
                 }

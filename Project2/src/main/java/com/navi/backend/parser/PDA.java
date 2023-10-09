@@ -44,9 +44,16 @@ public class PDA {
     }
 
     public static PDA getAutomaton(ArrayList<Token> tokens){
-        if(automaton == null){
+        /*if(automaton == null){
             automaton = new PDA(tokens);
+        }*/
+        ArrayList<Token> tokens1 = new ArrayList<>();
+        for(Token t: tokens){
+            if(t.getType()!=TokenType.COMMENT){
+                tokens1.add(t);
+            }
         }
+        automaton = new PDA(tokens1);
         //automaton.setTokens(tokens);
         return automaton;
     }
@@ -66,6 +73,9 @@ public class PDA {
         PDAState aux, aux1;
         aux = q0;
         while(index < tokens.size()){
+            if(aux==null){
+                break;
+            }
             aux1 = aux.getState(TokenType.EPSILON.toString(), stack);
             if(aux1 == null){
                 Token token = tokens.get(index);
@@ -73,7 +83,7 @@ public class PDA {
                     aux1 = aux.getState(token.getLexeme(), stack);
                 }
                 else aux1 = aux.getState(token.getType().toString(), stack);
-                System.out.println(token.getType().toString() + " " + token.getLexeme());
+                System.out.println(token.getType().toString() + " " + token.getLexeme() + " linea " + (token.getRow()+1));
                 System.out.println(stack);
 
                 if(aux1 == null){
@@ -150,20 +160,16 @@ public class PDA {
 
     private void addTransitions(PDAState q2){
         //FILA S
-        //String auxPush = "I;"+TokenType.$;
-        String auxPush = "I;";
-
-        q2.addTransition(TokenType.$.toString(),"S", auxPush, q2);
-        q2.addTransition(TokenType.IDENTIFIER.toString(),"S",auxPush, q2);
-        q2.addTransition("if","S",auxPush, q2);
-        q2.addTransition("for","S",auxPush, q2);
-        q2.addTransition("while","S",auxPush, q2);
-        q2.addTransition("def","S",auxPush, q2);
-
+        q2.addTransition(TokenType.$.toString(),"S", "I", q2);
+        q2.addTransition(TokenType.IDENTIFIER.toString(),"S","I", q2);
+        q2.addTransition("if","S","I", q2);
+        q2.addTransition("for","S","I", q2);
+        q2.addTransition("while","S","I", q2);
+        q2.addTransition("def","S","I", q2);
 
         // FILA INSTRUCTION <I>
         q2.addTransition(TokenType.$.toString(),"I", q2);
-        auxPush = TokenType.IDENTIFIER + ";A;" + TokenType.LINEBREAK + ";I";
+        String auxPush = TokenType.IDENTIFIER + ";A;" + TokenType.LINEBREAK + ";I";
         q2.addTransition(TokenType.IDENTIFIER.toString(),"I",auxPush, q2);
         q2.addTransition("if","I","Con;I", q2);
         q2.addTransition("for","I","For;I", q2);
@@ -186,7 +192,7 @@ public class PDA {
         q2.addTransition(TokenType.LINEBREAK.toString(),"Assigns", q2);
         auxPush = TokenType.ASSIGNMENT + ";E;Assigns";
         q2.addTransition(TokenType.ASSIGNMENT.toString(),"Assigns",auxPush, q2);
-        q2.addTransition("if","Assign", q2);
+        q2.addTransition("if","Assigns", q2);
 
         //FILA ASSIGN PRIMA <AssignP>
         q2.addTransition(TokenType.ASSIGNMENT.toString(),"AssignP",TokenType.ASSIGNMENT.toString(), q2);
@@ -195,10 +201,10 @@ public class PDA {
 
         //FILA TERNARY OPERATOR <OT>
         q2.addTransition(TokenType.LINEBREAK.toString(),"OT",q2);
-        q2.addTransition("if","OT","if;Comp;else;E", q2);
+        q2.addTransition("if","OT","if;O;else;E", q2);
 
         //FILA CONDITIONAL <Con>
-        auxPush = "if;Comp;:;" + TokenType.LINEBREAK + ";B;Elif;Else";
+        auxPush = "if;O;:;" + TokenType.LINEBREAK + ";B;Elif;Else";
         q2.addTransition("if","Con",auxPush, q2);
 
         //FILA ELSE IF <Elif>
@@ -206,7 +212,7 @@ public class PDA {
         q2.addTransition(TokenType.IDENTIFIER.toString(),"Elif", q2);
         q2.addTransition("if","Elif", q2);
         q2.addTransition("else","Elif", q2);
-        auxPush = "elif;Comp;:;"+TokenType.LINEBREAK+";B";
+        auxPush = "elif;O;:;"+TokenType.LINEBREAK+";B";
         q2.addTransition("elif","Elif",auxPush, q2);
         q2.addTransition("for","Elif", q2);
         q2.addTransition("while","Elif", q2);
@@ -228,28 +234,16 @@ public class PDA {
         q2.addTransition("return","Else", q2);
         q2.addTransition("break","Else", q2);
 
-        //FILA COMPARISON <Comp>
-        q2.addTransition(TokenType.IDENTIFIER.toString(),"Comp","Ep;CompP", q2);
-        q2.addTransition("(","Comp","Ep;CompP", q2);
-        q2.addTransition(TokenType.BOOLEAN.toString(),"Comp","Ep;CompP", q2);
-        q2.addTransition("-","Comp","Ep;CompP", q2);
-        q2.addTransition("not","Comp","not;Ep;CompP", q2);
-        q2.addTransition(TokenType.STRING.toString(),"Comp","Ep;CompP", q2);
-        q2.addTransition(TokenType.INT.toString(),"Comp","Ep;CompP", q2);
-        q2.addTransition(TokenType.DECIMAL.toString(),"Comp","Ep;CompP", q2);
-
-        //FILA COMPARISON PRIMA <CompP>
-        q2.addTransition("else","CompP", q2);
-        q2.addTransition(":","CompP", q2);
-        auxPush = TokenType.COMPARASION + ";Ep;CompP";
-        q2.addTransition(TokenType.COMPARASION.toString(),"CompP",auxPush, q2);
-
         //FILA FOR <For>
-        auxPush = "for;"+TokenType.IDENTIFIER + ";in;[;Es;];:;"+TokenType.LINEBREAK+";B;Else";
-        q2.addTransition("for","For",auxPush, q2);
+        q2.addTransition("for","For","for;O;ForP", q2);
+
+        //FILA FOR PRIMA <ForP>
+        auxPush = "in;Arr;:;"+TokenType.LINEBREAK+";B;Else";
+        q2.addTransition("not","ForP","not;"+auxPush, q2);
+        q2.addTransition("in","ForP",auxPush, q2);
 
         //FILA WHILE <While>
-        auxPush = "while;Comp;:;"+TokenType.LINEBREAK+";B";
+        auxPush = "while;O;:;"+TokenType.LINEBREAK+";B";
         q2.addTransition("while","While",auxPush, q2);
 
         //FILA FUNCTION <Fun>
@@ -295,15 +289,14 @@ public class PDA {
         q2.addTransition(TokenType.IDENTIFIER.toString(),"Es","E;EsP", q2);
         q2.addTransition("(","Es","E;EsP", q2);
         q2.addTransition(")","Es", q2);
+        q2.addTransition("not","Es","E;EsP", q2);
         q2.addTransition("[","Es","E;EsP", q2);
         q2.addTransition("]","Es", q2);
-        q2.addTransition("not","Es","E;EsP", q2);
         q2.addTransition("{","Es","E;EsP", q2);
-        q2.addTransition(TokenType.BOOLEAN.toString(),"Es","E;EsP", q2);
         q2.addTransition("-","Es","E;EsP", q2);
-        q2.addTransition(TokenType.STRING.toString(),"Es","E;EsP", q2);
         q2.addTransition(TokenType.INT.toString(),"Es","E;EsP", q2);
-        q2.addTransition(TokenType.DECIMAL.toString(),"Es","E;EsP", q2);
+        q2.addTransition(TokenType.STRING.toString(),"Es","E;EsP", q2);
+        q2.addTransition(TokenType.BOOLEAN.toString(),"Es","E;EsP", q2);
 
         //FILA EXPRESSIONS PRIMA <EsP>
         q2.addTransition(")","EsP", q2);
@@ -311,37 +304,211 @@ public class PDA {
         q2.addTransition("]","EsP", q2);
 
         //FILA BODY DICTIONARY <CD>
-        auxPush = TokenType.IDENTIFIER+";:;E;CDP";
-        q2.addTransition(TokenType.IDENTIFIER.toString(),"CD",auxPush, q2);
+        auxPush = TokenType.STRING+";:;E;CDP";
+        q2.addTransition(TokenType.STRING.toString(),"CD",auxPush, q2);
         q2.addTransition("}","CD", q2);
 
         //FILA BODY DICTIONARY PRIMA <CDP>
-        auxPush = ",;"+TokenType.IDENTIFIER+";:;E;CDP";
+        auxPush = ",;"+TokenType.STRING+";:;E;CDP";
         q2.addTransition(",","CDP",auxPush, q2);
         q2.addTransition("}","CDP", q2);
 
         //FILA EXPRESSION <E>
-        q2.addTransition(TokenType.IDENTIFIER.toString(),"E","EP", q2);
-        q2.addTransition("(","E","EP", q2);
-        q2.addTransition("[","E","EP", q2);
-        q2.addTransition("not","E","not;EP", q2);
-        q2.addTransition("{","E","EP", q2);
-        q2.addTransition(TokenType.BOOLEAN.toString(),"E","EP", q2);
-        q2.addTransition("-","E","EP", q2);
-        q2.addTransition(TokenType.STRING.toString(),"E","EP", q2);
-        q2.addTransition(TokenType.INT.toString(),"E","EP", q2);
-        q2.addTransition(TokenType.DECIMAL.toString(),"E","EP", q2);
+        q2.addTransition(TokenType.IDENTIFIER.toString(),"E","O;Ef", q2);
+        q2.addTransition("(","E","O;Ef", q2);
+        q2.addTransition("not","E","O;Ef", q2);
+        q2.addTransition("[","E","[;Es;]", q2);
+        q2.addTransition("{","E","{;CD;}", q2);
+        q2.addTransition("-","E","O;Ef", q2);
+        q2.addTransition(TokenType.INT.toString(),"E","O;Ef", q2);
+        q2.addTransition(TokenType.STRING.toString(),"E","O;Ef", q2);
+        q2.addTransition(TokenType.BOOLEAN.toString(),"E","O;Ef", q2);
 
-        //FILA EXPRESSION PRIMA <EP>
-        q2.addTransition(TokenType.IDENTIFIER.toString(),"EP","Ep", q2);
-        q2.addTransition("(","EP","Ep", q2);
-        q2.addTransition("[","EP","[;Es;]", q2);
-        q2.addTransition("{","EP","{;CD;}", q2);
-        q2.addTransition(TokenType.BOOLEAN.toString(),"EP","Ep", q2);
-        q2.addTransition("-","EP","Ep", q2);
-        q2.addTransition(TokenType.STRING.toString(),"EP","Ep", q2);
-        q2.addTransition(TokenType.INT.toString(),"EP","Ep", q2);
-        q2.addTransition(TokenType.DECIMAL.toString(),"EP","Ep", q2);
+        //FILA EXPRESSION FOR <Ef>
+        q2.addTransition(TokenType.LINEBREAK.toString(),"Ef", q2);
+        q2.addTransition(")","Ef", q2);
+        q2.addTransition(TokenType.ASSIGNMENT.toString(),"Ef", q2);
+        q2.addTransition(",","Ef", q2);
+        q2.addTransition("if","Ef", q2);
+        q2.addTransition("not","Ef","not;in;Arr", q2);
+        q2.addTransition("in","Ef","in;Arr", q2);
+        q2.addTransition("]","Ef", q2);
+        q2.addTransition("}","Ef", q2);
+
+        //FILA ARRAYS <Arr>
+        auxPush = TokenType.IDENTIFIER + ";L";
+        q2.addTransition(TokenType.IDENTIFIER.toString(),"Arr",auxPush, q2);
+        q2.addTransition("[","Arr","[;Es;]", q2);
+
+        //FILA OPERATION <O>
+        q2.addTransition(TokenType.IDENTIFIER.toString(), "O","Oc;OP",q2);
+        q2.addTransition("(", "O","Oc;OP",q2);
+        q2.addTransition("not", "O","Oc;OP",q2);
+        q2.addTransition("-", "O","Oc;OP",q2);
+        q2.addTransition(TokenType.INT.toString(), "O","Oc;OP",q2);
+        q2.addTransition(TokenType.STRING.toString(), "O","Oc;OP",q2);
+        q2.addTransition(TokenType.BOOLEAN.toString(), "O","Oc;OP",q2);
+
+        //FILA OPERATION PRIMA <OP>
+        q2.addTransition(TokenType.LINEBREAK.toString(),"OP",q2);
+        q2.addTransition(")","OP",q2);
+        q2.addTransition(TokenType.ASSIGNMENT.toString(),"OP",q2);
+        q2.addTransition(",","OP",q2);
+        q2.addTransition("if","OP",q2);
+        q2.addTransition("else","OP",q2);
+        q2.addTransition(":","OP",q2);
+        q2.addTransition("not","OP",q2);
+        q2.addTransition("in","OP",q2);
+        q2.addTransition("]","OP",q2);
+        q2.addTransition("}","OP",q2);
+        auxPush = TokenType.LOGIC + ";Oc;OP";
+        q2.addTransition(TokenType.LOGIC.toString(),"OP",auxPush,q2);
+        q2.addTransition("and","OP","and;Oc;OP",q2);
+        q2.addTransition("or","OP","or;Oc;OP",q2);
+        q2.addTransition("is","OP","is;Oc;OP",q2);
+
+        //FILA OPERATION COMPARISON <Oc>
+        q2.addTransition(TokenType.IDENTIFIER.toString(), "Oc","SR;OcP",q2);
+        q2.addTransition("(", "Oc","SR;OcP",q2);
+        q2.addTransition("not", "Oc","SR;OcP",q2);
+        q2.addTransition("-", "Oc","SR;OcP",q2);
+        q2.addTransition(TokenType.INT.toString(), "Oc","SR;OcP",q2);
+        q2.addTransition(TokenType.STRING.toString(), "Oc","SR;OcP",q2);
+        q2.addTransition(TokenType.BOOLEAN.toString(), "Oc","SR;OcP",q2);
+
+        //FILA OPERATION COMPARISON PRIMA <OcP>
+        q2.addTransition(TokenType.LINEBREAK.toString(),"OcP",q2);
+        q2.addTransition(")","OcP",q2);
+        q2.addTransition(TokenType.ASSIGNMENT.toString(),"OcP",q2);
+        q2.addTransition(",","OcP",q2);
+        q2.addTransition("if","OcP",q2);
+        q2.addTransition("else","OcP",q2);
+        q2.addTransition(":","OcP",q2);
+        q2.addTransition("not","OcP",q2);
+        q2.addTransition("in","OcP",q2);
+        q2.addTransition("]","OcP",q2);
+        q2.addTransition("}","OcP",q2);
+        q2.addTransition(TokenType.LOGIC.toString(),"OcP",q2);
+        q2.addTransition("and","OcP",q2);
+        q2.addTransition("or","OcP",q2);
+        q2.addTransition("is","OcP",q2);
+        auxPush = TokenType.COMPARASION + ";SR;OcP";
+        q2.addTransition(TokenType.COMPARASION.toString(),"OcP",auxPush,q2);
+
+        //FILA ADDITION SUBTRACTION <SR>
+        q2.addTransition(TokenType.IDENTIFIER.toString(), "SR","MD;SRP",q2);
+        q2.addTransition("(", "SR","MD;SRP",q2);
+        q2.addTransition("not", "SR","MD;SRP",q2);
+        q2.addTransition("-", "SR","MD;SRP",q2);
+        q2.addTransition(TokenType.INT.toString(), "SR","MD;SRP",q2);
+        q2.addTransition(TokenType.STRING.toString(), "SR","MD;SRP",q2);
+        q2.addTransition(TokenType.BOOLEAN.toString(), "SR","MD;SRP",q2);
+
+        //FILA ADDITION SUBTRACTION PRIMA <SRP>
+        q2.addTransition(TokenType.LINEBREAK.toString(),"SRP",q2);
+        q2.addTransition(")","SRP",q2);
+        q2.addTransition(TokenType.ASSIGNMENT.toString(),"SRP",q2);
+        q2.addTransition(",","SRP",q2);
+        q2.addTransition("if","SRP",q2);
+        q2.addTransition("else","SRP",q2);
+        q2.addTransition(":","SRP",q2);
+        q2.addTransition("not","SRP",q2);
+        q2.addTransition("in","SRP",q2);
+        q2.addTransition("]","SRP",q2);
+        q2.addTransition("}","SRP",q2);
+        q2.addTransition(TokenType.LOGIC.toString(),"SRP",q2);
+        q2.addTransition("and","SRP",q2);
+        q2.addTransition("or","SRP",q2);
+        q2.addTransition("is","SRP",q2);
+        q2.addTransition(TokenType.COMPARASION.toString(),"SRP",q2);
+        auxPush = TokenType.COMPARASION + ";SR;OcP";
+        q2.addTransition("+","SRP","+;MD;SRP", q2);
+        q2.addTransition("-","SRP","-;MD;SRP", q2);
+
+        //FILA MULTIPLICATION DIVISION <MD>
+        q2.addTransition(TokenType.IDENTIFIER.toString(), "MD","Exp;MDP",q2);
+        q2.addTransition("(", "MD","Exp;MDP",q2);
+        q2.addTransition("not", "MD","Exp;MDP",q2);
+        q2.addTransition("-", "MD","Exp;MDP",q2);
+        q2.addTransition(TokenType.INT.toString(), "MD","Exp;MDP",q2);
+        q2.addTransition(TokenType.STRING.toString(), "MD","Exp;MDP",q2);
+        q2.addTransition(TokenType.BOOLEAN.toString(), "MD","Exp;MDP",q2);
+
+        //FILA MULTIPLICATION DIVISION PRIMA <MDP>
+        q2.addTransition(TokenType.LINEBREAK.toString(),"MDP",q2);
+        q2.addTransition(")","MDP",q2);
+        q2.addTransition(TokenType.ASSIGNMENT.toString(),"MDP",q2);
+        q2.addTransition(",","MDP",q2);
+        q2.addTransition("if","MDP",q2);
+        q2.addTransition("else","MDP",q2);
+        q2.addTransition(":","MDP",q2);
+        q2.addTransition("not","MDP",q2);
+        q2.addTransition("in","MDP",q2);
+        q2.addTransition("]","MDP",q2);
+        q2.addTransition("}","MDP",q2);
+        q2.addTransition(TokenType.LOGIC.toString(),"MDP",q2);
+        q2.addTransition("and","MDP",q2);
+        q2.addTransition("or","MDP",q2);
+        q2.addTransition("is","MDP",q2);
+        q2.addTransition(TokenType.COMPARASION.toString(),"MDP",q2);
+        q2.addTransition("+","MDP", q2);
+        q2.addTransition("-","MDP", q2);
+        q2.addTransition("*","MDP","*;Exp;MDP", q2);
+        q2.addTransition("/","MDP","/;Exp;MDP", q2);
+        q2.addTransition("//","MDP","//;Exp;MDP", q2);
+        q2.addTransition("%","MDP","%;Exp;MDP", q2);
+
+        //FILA EXPONENT <Exp>
+        q2.addTransition(TokenType.IDENTIFIER.toString(), "Exp","First;ExpP",q2);
+        q2.addTransition("not", "Exp","First;ExpP",q2);
+        q2.addTransition("(", "Exp","First;ExpP",q2);
+        q2.addTransition("-", "Exp","First;ExpP",q2);
+        q2.addTransition(TokenType.INT.toString(), "Exp","First;ExpP",q2);
+        q2.addTransition(TokenType.STRING.toString(), "Exp","First;ExpP",q2);
+        q2.addTransition(TokenType.BOOLEAN.toString(), "Exp","First;ExpP",q2);
+
+        //FILA EXPONENT PRIMA <ExpP>
+        q2.addTransition(TokenType.LINEBREAK.toString(),"ExpP",q2);
+        q2.addTransition(")","ExpP",q2);
+        q2.addTransition(TokenType.ASSIGNMENT.toString(),"ExpP",q2);
+        q2.addTransition(",","ExpP",q2);
+        q2.addTransition("if","ExpP",q2);
+        q2.addTransition("else","ExpP",q2);
+        q2.addTransition(":","ExpP",q2);
+        q2.addTransition("not","ExpP",q2);
+        q2.addTransition("in","ExpP",q2);
+        q2.addTransition("]","ExpP",q2);
+        q2.addTransition("}","ExpP",q2);
+        q2.addTransition(TokenType.LOGIC.toString(),"ExpP",q2);
+        q2.addTransition("and","ExpP",q2);
+        q2.addTransition("or","ExpP",q2);
+        q2.addTransition("is","ExpP",q2);
+        q2.addTransition(TokenType.COMPARASION.toString(),"ExpP",q2);
+        q2.addTransition("+","ExpP", q2);
+        q2.addTransition("-","ExpP", q2);
+        q2.addTransition("*","ExpP", q2);
+        q2.addTransition("/","ExpP", q2);
+        q2.addTransition("//","ExpP", q2);
+        q2.addTransition("%","ExpP", q2);
+        q2.addTransition("**","ExpP","**;First;ExpP", q2);
+
+        //FILA FIRST <First>
+        q2.addTransition(TokenType.IDENTIFIER.toString(), "First","Ec",q2);
+        q2.addTransition("(", "First","Ec",q2);
+        q2.addTransition("not", "First","not;Ec",q2);
+        q2.addTransition("-", "First","Ec",q2);
+        q2.addTransition(TokenType.INT.toString(), "First","Ec",q2);
+        q2.addTransition(TokenType.STRING.toString(), "First","Ec",q2);
+        q2.addTransition(TokenType.BOOLEAN.toString(), "First","Ec",q2);
+
+        //FILA EXPRESSION JOIN <Ec>
+        q2.addTransition(TokenType.IDENTIFIER.toString(),"Ec","Ep", q2);
+        q2.addTransition("(","Ec","(;O;)",q2);
+
+        q2.addTransition("-","Ec","Ep",q2);
+        q2.addTransition(TokenType.INT.toString(), "Ec","Ep",q2);
+        q2.addTransition(TokenType.STRING.toString(), "Ec","Ep",q2);
+        q2.addTransition(TokenType.BOOLEAN.toString(),"Ec","Ep",q2);
 
         //FILA CALL FUNCTION <L>
         q2.addTransition(TokenType.LINEBREAK.toString(),"L",q2);
@@ -352,102 +519,30 @@ public class PDA {
         q2.addTransition("if","L",q2);
         q2.addTransition("else","L",q2);
         q2.addTransition(":","L",q2);
-        q2.addTransition(TokenType.COMPARASION.toString(),"L",q2);
+        q2.addTransition("not","L",q2);
+        q2.addTransition("in","L",q2);
         q2.addTransition("]","L",q2);
         q2.addTransition("}","L",q2);
+        q2.addTransition(TokenType.LOGIC.toString(),"L",q2);
+        q2.addTransition("and","L",q2);
+        q2.addTransition("or","L",q2);
+        q2.addTransition("is","L",q2);
+        q2.addTransition(TokenType.COMPARASION.toString(),"L",q2);
+        q2.addTransition("+","L", q2);
+        q2.addTransition("-","L", q2);
+        q2.addTransition("*","L", q2);
+        q2.addTransition("/","L", q2);
+        q2.addTransition("//","L", q2);
+        q2.addTransition("%","L", q2);
+        q2.addTransition("**","L", q2);
 
-        //FILA PRIMARY EXPRESSION <Ep>
+        //FILA PRIMITIVE EXPRESSION <Ep>
         auxPush = TokenType.IDENTIFIER + ";L";
         q2.addTransition(TokenType.IDENTIFIER.toString(),"Ep",auxPush, q2);
-        q2.addTransition("(","Ep","O",q2);
+        auxPush = "-;"+TokenType.INT;
+        q2.addTransition("-","Ep",auxPush,q2);
+        q2.addTransition(TokenType.INT.toString(), "Ep",TokenType.INT.toString(),q2);
+        q2.addTransition(TokenType.STRING.toString(), "Ep",TokenType.STRING.toString(),q2);
         q2.addTransition(TokenType.BOOLEAN.toString(),"Ep",TokenType.BOOLEAN.toString(),q2);
-        q2.addTransition("-","Ep","O",q2);
-        q2.addTransition(TokenType.STRING.toString(), "Ep","O",q2);
-        q2.addTransition(TokenType.INT.toString(), "Ep","O",q2);
-        q2.addTransition(TokenType.DECIMAL.toString(), "Ep","O",q2);
-
-        //FILA OPERATION <O>
-        q2.addTransition("(", "O","MD;OP",q2);
-        q2.addTransition("-", "O","MD;OP",q2);
-        q2.addTransition(TokenType.STRING.toString(), "O","MD;OP",q2);
-        q2.addTransition(TokenType.INT.toString(), "O","MD;OP",q2);
-        q2.addTransition(TokenType.DECIMAL.toString(), "O","MD;OP",q2);
-
-        //FILA OPERATION PRIMA <OP>
-        q2.addTransition(TokenType.LINEBREAK.toString(),"OP",q2);
-        q2.addTransition(")","OP",q2);
-        q2.addTransition(TokenType.ASSIGNMENT.toString(),"OP",q2);
-        q2.addTransition(",","OP",q2);
-        q2.addTransition("if","OP",q2);
-        q2.addTransition("else","OP",q2);
-        q2.addTransition(":","OP",q2);
-        q2.addTransition(TokenType.COMPARASION.toString(),"OP",q2);
-        q2.addTransition("]","OP",q2);
-        q2.addTransition("}","OP",q2);
-        q2.addTransition("+","OP","+;MD;OP", q2);
-        q2.addTransition("-","OP","-;MD;OP", q2);
-
-        //FILA MULTIPLICATION DIVISION <MD>
-        q2.addTransition("(", "MD","Exp;MDP",q2);
-        q2.addTransition("-", "MD","Exp;MDP",q2);
-        q2.addTransition(TokenType.STRING.toString(), "MD","Exp;MDP",q2);
-        q2.addTransition(TokenType.INT.toString(), "MD","Exp;MDP",q2);
-        q2.addTransition(TokenType.DECIMAL.toString(), "MD","Exp;MDP",q2);
-
-        //FILA MULTIPLICATION DIVISION PRIMA <MDP>
-        q2.addTransition(TokenType.LINEBREAK.toString(),"MDP",q2);
-        q2.addTransition(")","MDP",q2);
-        q2.addTransition(TokenType.ASSIGNMENT.toString(),"MDP",q2);
-        q2.addTransition(",","MDP",q2);
-        q2.addTransition("if","MDP",q2);
-        q2.addTransition("else","MDP",q2);
-        q2.addTransition(":","MDP",q2);
-        q2.addTransition(TokenType.COMPARASION.toString(),"MDP",q2);
-        q2.addTransition("*","MDP","*;Exp;MDP", q2);
-        q2.addTransition("]","MDP",q2);
-        q2.addTransition("}","MDP",q2);
-        q2.addTransition("+","MDP", q2);
-        q2.addTransition("-","MDP", q2);
-        q2.addTransition("/","MDP","/;Exp;MDP", q2);
-        q2.addTransition("//","MDP","//;Exp;MDP", q2);
-        q2.addTransition("%","MDP","%;Exp;MDP", q2);
-
-        //FILA EXPONENT <Exp>
-        q2.addTransition("(", "Exp","First;ExpP",q2);
-        q2.addTransition("-", "Exp","First;ExpP",q2);
-        q2.addTransition(TokenType.STRING.toString(), "Exp","First;ExpP",q2);
-        q2.addTransition(TokenType.INT.toString(), "Exp","First;ExpP",q2);
-        q2.addTransition(TokenType.DECIMAL.toString(), "Exp","First;ExpP",q2);
-
-        //FILA EXPONENT PRIMA <ExpP>
-        q2.addTransition(TokenType.LINEBREAK.toString(),"ExpP",q2);
-        q2.addTransition(")","ExpP",q2);
-        q2.addTransition(TokenType.ASSIGNMENT.toString(),"ExpP",q2);
-        q2.addTransition(",","ExpP",q2);
-        q2.addTransition("if","ExpP",q2);
-        q2.addTransition("else","ExpP",q2);
-        q2.addTransition(":","ExpP",q2);
-        q2.addTransition(TokenType.COMPARASION.toString(),"ExpP",q2);
-        q2.addTransition("*","ExpP", q2);
-        q2.addTransition("]","ExpP",q2);
-        q2.addTransition("}","ExpP",q2);
-        q2.addTransition("+","ExpP", q2);
-        q2.addTransition("-","ExpP", q2);
-        q2.addTransition("/","ExpP", q2);
-        q2.addTransition("//","ExpP", q2);
-        q2.addTransition("%","ExpP", q2);
-        q2.addTransition("**","ExpP","**;First;ExpP", q2);
-
-        //FILA FIRST <First>
-        q2.addTransition("(", "First","(;O;)",q2);
-        q2.addTransition("-", "First","-;Num",q2);
-        q2.addTransition(TokenType.STRING.toString(), "First",TokenType.STRING.toString(),q2);
-        q2.addTransition(TokenType.INT.toString(), "First","Num",q2);
-        q2.addTransition(TokenType.DECIMAL.toString(), "First","Num",q2);
-
-        //FILA NUMBER <Num>
-        q2.addTransition(TokenType.INT.toString(), "Num",TokenType.INT.toString(),q2);
-        q2.addTransition(TokenType.DECIMAL.toString(), "Num",TokenType.DECIMAL.toString(),q2);
-
     }
 }
