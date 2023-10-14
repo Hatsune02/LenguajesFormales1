@@ -193,11 +193,15 @@ public class Analyzer {
             }
             if(i-1>0 && i+1 < tokens.size()){
                 Token tokenB = tokens.get(i-1);
-                if(token.getType()==TokenType.COMMENT && (tokenB.getType()==TokenType.LINEBREAK || tokenB.getType()==TokenType.INDENT || tokenB.getType()==TokenType.DEDENT)){
-                    tokens.remove(i+1);
+                if(token.getType()==TokenType.COMMENT){
+                    if(tokenB.getType()==TokenType.LINEBREAK || tokenB.getType()==TokenType.INDENT || tokenB.getType()==TokenType.DEDENT){
+                        tokens.remove(i+1);
+                    }
+                    else if(tokenB.getType()==TokenType.COMMENT){
+                        tokens.remove(i+1);
+                    }
                 }
             }
-
         }
         return tokens;
     }

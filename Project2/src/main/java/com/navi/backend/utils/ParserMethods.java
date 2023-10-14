@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public class ParserMethods {
 
+
     public static ArrayList<Symbol> symbols(ArrayList<Token> tokens, int index, int indexF){
         ArrayList<Symbol> symbols = new ArrayList<>();
 
@@ -20,18 +21,41 @@ public class ParserMethods {
                 else if(token.getLexeme().equals("def") && tokenAfter.getType()==TokenType.IDENTIFIER){
                     searchReturn(tokens,symbols,tokenAfter,i);
                     param(tokens,symbols,i);
+                    for (int j = i; j < indexF; j++) {
+                        Token aux = tokens.get(j);
+                        if(aux.getType()==TokenType.LINEBREAK){
+                            break;
+                        }
+                        else i++;
+                    }
                 }
             }
-            if(i+1 < tokens.size() && i-1 > index){
-                Token tokenBefore = tokens.get(i-1);
+            if(i+2 < tokens.size()){
                 Token token = tokens.get(i);
                 Token tokenAfter = tokens.get(i+1);
-                if(!tokenBefore.getLexeme().equals("return") && token.getType() == TokenType.IDENTIFIER && !tokenAfter.getLexeme().equals("(")){
-                    i = analyzeLine(tokens,symbols,i);
+                Token tokenAA = tokens.get(i+2);
+                if(token.getType()==TokenType.IDENTIFIER){
+                    if(!tokenAfter.getLexeme().equals("(")){
+                        i = analyzeLine(tokens,symbols,i);
+                    }
                 }
-                else if(token.getLexeme().equals("def") && tokenAfter.getType()==TokenType.IDENTIFIER){
-                    searchReturn(tokens,symbols,tokenAfter,i);
-                    param(tokens,symbols,i);
+                else if((token.getType()==TokenType.DEDENT || token.getType()==TokenType.INDENT)){
+                    if(tokenAfter.getType()==TokenType.IDENTIFIER && !tokenAA.getLexeme().equals("(")){
+                        i = analyzeLine(tokens,symbols,i+1);
+                    }
+                    else if(tokenAfter.getLexeme().equals("def") && tokenAA.getType()==TokenType.IDENTIFIER){
+                        searchReturn(tokens,symbols,tokenAA,i+1);
+                        param(tokens,symbols,i+1);
+                    }
+                }
+                else {
+                    for (int j = i; j < indexF; j++) {
+                        Token aux = tokens.get(j);
+                        if(aux.getType()==TokenType.LINEBREAK){
+                            break;
+                        }
+                        else i++;
+                    }
                 }
             }
 
@@ -160,9 +184,9 @@ public class ParserMethods {
                 if(indents == 1 && auxToken.getLexeme().equals("return")){
                     StringBuilder val = new StringBuilder();
                     for (int k = i+j+1; k < tokens.size(); k++) {
-                        Token token1 = tokens.get(k);
-                        if (token1.getType()!=TokenType.LINEBREAK){
-                            if(token1.getType()!= TokenType.COMMENT) val.append(token1.getLexeme());
+                        Token aux = tokens.get(k);
+                        if (aux.getType()!=TokenType.LINEBREAK){
+                            val.append(aux.getLexeme());
                         }
                         else break;
                     }
@@ -192,7 +216,10 @@ public class ParserMethods {
                     Token aux = tokens.get(i+j);
                     if(i+j < tokens.size()){
 
-                        if(aux.getType()==TokenType.KEYWORD) name.append(" ").append(aux.getLexeme()).append(" ");
+                        if(aux.getType()==TokenType.KEYWORD) {
+                            if(name.isEmpty()) name.append(aux.getLexeme()).append(" ");
+                            else name.append(" ").append(aux.getLexeme()).append(" ");
+                        }
                         else if(aux.getLexeme().equals(",")) name.append(aux.getLexeme()).append(" ");
                         else name.append(aux.getLexeme());
 
@@ -248,7 +275,10 @@ public class ParserMethods {
             if(token.getType()==TokenType.LINEBREAK){
                 instructions.add(new Instruction(first.getRow(),body.toString(),first.getColumn()));
                 body = new StringBuilder();
-                if(i+1 < indexF) first = tokens.get(i+1);
+                if(i+2 < indexF) {
+                    if(tokens.get(i+1).getType()==TokenType.DEDENT) first = tokens.get(i+2);
+                    else first = tokens.get(i+1);
+                }
             }
             else if(token.getType()!=TokenType.INDENT && token.getType()!=TokenType.DEDENT && token.getType()!=TokenType.COMMENT){
                 if(token.getType()==TokenType.KEYWORD) {
@@ -293,7 +323,7 @@ public class ParserMethods {
     }
     public static String param(ArrayList<Token> tokens,int i){
         StringBuilder param = new StringBuilder();
-        for (int j = i; j < tokens.size()-i; j++) {
+        for (int j = i; j < tokens.size(); j++) {
             Token aux = tokens.get(j);
             if(aux.getLexeme().equals(")")){
                 break;

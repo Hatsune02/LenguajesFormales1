@@ -47,13 +47,7 @@ public class PDA {
         /*if(automaton == null){
             automaton = new PDA(tokens);
         }*/
-        ArrayList<Token> tokens1 = new ArrayList<>();
-        for(Token t: tokens){
-            if(t.getType()!=TokenType.COMMENT){
-                tokens1.add(t);
-            }
-        }
-        automaton = new PDA(tokens1);
+        automaton = new PDA(tokens);
         //automaton.setTokens(tokens);
         return automaton;
     }
@@ -253,7 +247,7 @@ public class PDA {
         //FILA PARAMETERS <Ps>
         q2.addTransition(TokenType.IDENTIFIER.toString(),"Ps","P", q2);
         q2.addTransition(")","Ps", q2);
-        q2.addTransition("*","Ps","*;args", q2);
+        q2.addTransition("*","Ps","*;"+TokenType.IDENTIFIER, q2);
 
         //FILA PARAMETER <P>
         auxPush = TokenType.IDENTIFIER+";PP";

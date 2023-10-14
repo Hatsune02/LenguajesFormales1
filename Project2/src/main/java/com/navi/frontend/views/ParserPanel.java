@@ -74,11 +74,12 @@ public class ParserPanel extends javax.swing.JPanel {
             analyzer.analyze();
 
             tokens = analyzer.getTokens();
+            tokens.removeIf(t -> t.getType() == TokenType.COMMENT);
             pda = PDA.getAutomaton(tokens);
-            //if(tokens!=null) pda.analyze(0);
+            if(tokens!=null) pda.analyze(0);
             errors = new StringBuilder();
 
-            //SHOE ERRORS
+            //SHOW ERRORS
             ArrayList<Token> tokensError = LexerMethods.filterArrayList(TokenType.ERROR,tokens);
             if(tokensError.size()!=0) errors.append("Errores Léxicos:\n").append(tokensError).append("\n");
             if(!pda.getError().isEmpty()) errors.append("\nErrores Sintácticos\n").append(pda.getError());
@@ -86,18 +87,16 @@ public class ParserPanel extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(null,"Error");
                 textPaneError.setText(errors.toString());
             }
-            else textPaneError.setText("");;
+            else {
+                JOptionPane.showMessageDialog(null,"Analisis Completo");
+                textPaneError.setText("");
+            }
 
             //FILL ARRAYS
             symbols = ParserMethods.symbols(tokens,0, tokens.size());
             blocks = ParserMethods.blocks(tokens);
             instructions = ParserMethods.instructions(tokens,0,tokens.size());
             functions = ParserMethods.functions(tokens);
-
-            //System.out.println(tokens.size());
-            /*for(Token t : tokens){
-                System.out.println(t);
-            }*/
 
         }
         else{
